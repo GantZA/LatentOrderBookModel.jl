@@ -1,0 +1,4 @@
+name = "LatentOrderBookModel"
+uuid = "46e36380-895a-11e9-2f8e-bd7dce38e4c1"
+authors = ["Michael Gant <gntmic002@myuct.ac.za>"]
+version = "0.1.0"
