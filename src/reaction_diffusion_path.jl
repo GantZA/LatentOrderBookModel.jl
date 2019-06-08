@@ -2,7 +2,6 @@ using Statistics
 using Distributions
 
 include("reaction_diffusion_spde.jl")
-include("mom_basic.jl")
 
 # Generate a time series of stock prices by repeatedly solving the PDE
 # from Mastromatteo et al. (2014) to model the latent order book.
@@ -11,47 +10,51 @@ include("mom_basic.jl")
 # where T is the number of measured prices stored in the loaded
 # ObjectiveFunction object.
 
+mutable struct DTRW_RD_Params
+    a_b::Array{Float64,1}
+    x::Array{Float64,1}
+    advective_coeff::Float64
+    mid_price::Float64
+end
 
+function reaction_diffusion_path(rdp_params, st_params)
 
-function reaction_diffusion_path(bar_data, σ, D, ν, source_func::Function,
-    source_params)
+    # get reaction diffusion path parameters from rdp_params
+    p0          = rdp_params.initial_mid_price
+    T           = rdp_params.T
+    sample_std  = rdp_params.sample_std
+    σ           = rdp_params.σ
+    β           = rdp_params.boltz_const
+    n           = rdp_params.n_spatial_points
+    D           = rdp_params.D
+    η           = rdp_params.η
+    τ           = rdp_params.τ
 
-    T = size(bar_data,1)
-    # determine initial mid-price
-    prices = bar_data.price
-
-    # p0 = mean(prices)
-    p0 = prices[1]
-
-    # construct price vector
+    # construct vector of simulated prices, filling with p0
     p = p0 * ones(T)
-
-    # Number of Spatial (price) discretization points
-    n = 501
-
-    # Boltzmann Constant
-    β = 2
-
-    sample_std = std(prices)
 
     for t in 1:T-1
         # Boundaries of prices [a,b]
-        a = max(0,p[t] - 3*sample_std)
+        a = max(0, p[t] - 3*sample_std)
         b = p[t] + 3*sample_std
 
         # Price Grid
-        x = collect(range(a,b, length= n))
+        x = collect(range(a, b, length=n))
 
-        V₀ = rand(Normal(0,σ))
+        # Generate the Advective Coefficient using a seed for reproducibility
+        V₀ = rand(Normal(0, σ))
 
-        # Iterate Solver
-        U =  DTRW_reaction_diffusion(a,b,D,V₀,ν,source_params,β,p[t],n,10)
+        # Create struct for DTRW extra params
+        dtrw_rd_params = DTRW_RD_Params([a, b], x, V₀, p[t])
 
-        # Extract Mid-Price
+        # Iterate DTRW Solver τ time steps
+        U =  DTRW_reaction_diffusion(dtrw_rd_params, rdp_params,
+            source_term_params)
+
+        # Extract Mid-Price by finding the index where the density functions
+        # meet. The price at that index is the next simulated midprice
         mid_price_ind = argmin(abs.(U))
         p[t+1] = x[mid_price_ind]
     end
     return p
 end
-
-# Params: log_prices, σ, D, ν, source_func::Function,source_params
