@@ -5,18 +5,26 @@ include("source_function.jl")
 # SPDE
 # ϱₜ = -Vₜ * ϱₓ + D * ϱₓₓ - η * ϱ(x,t) + λ * tanh(μ * (p(t) - x))
 
+mutable struct DTRW_RD_Params
+    a_b::Array{Float64,1}
+    x::Array{Float64,1}
+    advective_coeff::Float64
+    mid_price::Float64
+end
+
+
 function stochastic_drift(α₀, α, ε)
     return α₀ + α*ε
 end
 
-function get_initial_conditions(dtrw_params, rdp_params, source_term_params)
+function get_initial_conditions(dtrw_params, rdp_params, st_params)
     a,b         = dtrw_params.a_b
     x           = dtrw_params.x
     n           = rdp_params.n_spatial_points
     V₀          = dtrw_params.advective_coeff
     D           = rdp_params.D
     mid_price   = dtrw_params.mid_price
-
+    η           = rdp_params.η
 
     Δx = (b - a)/(n-1)
     A = Tridiagonal(
@@ -27,13 +35,13 @@ function get_initial_conditions(dtrw_params, rdp_params, source_term_params)
     A[1,2] = 2*D/Δx^2
     A[end, end-1] = 2*D/Δx^2
 
-    B = .-[source_term(x, source_term_params, mid_price) for xᵢ in x]
+    B = .-[source_term(xᵢ, st_params, mid_price) for xᵢ in x]
 
     U = A \ B
     return U
 end
 
-function DTRW_reaction_diffusion( dtrw_params, rdp_params, source_term_params)
+function DTRW_reaction_diffusion( dtrw_params, rdp_params, st_params)
     #ϱₜ = -Vₜ * ϱₓ + D * ϱₓₓ - η * ϱ(x,t) + λ * tanh(μ * (p(t) - x))
 
     # get reaction diffusion path parameters from rdp_params
@@ -41,13 +49,13 @@ function DTRW_reaction_diffusion( dtrw_params, rdp_params, source_term_params)
     x           = dtrw_params.x
     V₀          = dtrw_params.advective_coeff
     mid_price   = dtrw_params.mid_price
-    β           = dtrw_params.boltz_const
+    β           = rdp_params.boltz_const
     n           = rdp_params.n_spatial_points
     D           = rdp_params.D
-    η           = dtrw_params.η
-    τ           = dtrw_params.τ
+    η           = rdp_params.η
+    τ           = rdp_params.τ
 
-    u0 = get_initial_conditions(dtrw_params, rdp_params, source_term_params)
+    u0 = get_initial_conditions(dtrw_params, rdp_params, st_params)
     u = u0[:]
     Δx = (b - a)/(n - 1)
     Δt = (Δx^2) / (2*D)
@@ -74,14 +82,14 @@ function DTRW_reaction_diffusion( dtrw_params, rdp_params, source_term_params)
         u[1] = jump_prob_left[1] * u0[1] +
             jump_prob_left[2] * u0[2] +
             jump_prob_self[1] * u0[1] - η * u0[1] +
-            source_term(x[1], source_term_params, mid_price)
+            source_term(x[1], st_params, mid_price)
 
         # Compute Interior Points
         u[2:end-1] = jump_prob_right[1:end-2] .* u0[1:end-2] +
             jump_prob_left[3:end] .* u0[3:end] +
             jump_prob_self[2:end-1] .* u0[2:end-1] -
             η * u0[2:end-1] +
-            [source_term(xᵢ, source_term_params, mid_price) for xᵢ in x[2:end-1]]
+            [source_term(xᵢ, st_params, mid_price) for xᵢ in x[2:end-1]]
 
         # The 'mass' at site 'j' at the next time step is the mass at 'j-1'
         # times the probability of right plus the mass at 'j+1' times the
@@ -92,7 +100,7 @@ function DTRW_reaction_diffusion( dtrw_params, rdp_params, source_term_params)
         u[end] = jump_prob_right[end-1] * u0[end-1] +
             jump_prob_right[end] * u0[end] +
             jump_prob_self[end] * u0[end] -
-            η * u0[end] + source_term(x[end], source_params, mid_price)
+            η * u0[end] + source_term(x[end], st_params, mid_price)
 
         u0 = u[:]
     end

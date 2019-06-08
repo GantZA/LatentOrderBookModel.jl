@@ -10,11 +10,17 @@ include("reaction_diffusion_spde.jl")
 # where T is the number of measured prices stored in the loaded
 # ObjectiveFunction object.
 
-mutable struct DTRW_RD_Params
-    a_b::Array{Float64,1}
-    x::Array{Float64,1}
-    advective_coeff::Float64
-    mid_price::Float64
+
+mutable struct RDP_Params
+    T::Int64
+    τ::Int64
+    initial_mid_price::Float64
+    n_spatial_points::Int64
+    boltz_const::Float64
+    sample_std::Float64
+    σ::Float64
+    D::Float64
+    η::Float64
 end
 
 function reaction_diffusion_path(rdp_params, st_params)
@@ -49,7 +55,7 @@ function reaction_diffusion_path(rdp_params, st_params)
 
         # Iterate DTRW Solver τ time steps
         U =  DTRW_reaction_diffusion(dtrw_rd_params, rdp_params,
-            source_term_params)
+            st_params)
 
         # Extract Mid-Price by finding the index where the density functions
         # meet. The price at that index is the next simulated midprice

@@ -10,9 +10,14 @@ The function returns a single scalar output
 
 """
 
+mutable struct ST_Params
+    λ::Float64
+    μ::Float64
+end
+
 function source_term(
     x::Float64,
-    source_params::st_params,
+    source_params::ST_Params,
     p::Float64)
 
     λ = source_params.λ
