@@ -9,6 +9,6 @@ reaction_diffusion_path(SEED::Int64, T::Int64, τ::Int64,
     reaction_diffusion_path(RDP_Params(SEED, T, τ, initial_mid_price,
     n_spatial_points, boltz_const, sample_std, σ, D, η), ST_Params(λ, μ))
 
-export reaction_diffusion_path
+export reaction_diffusion_path, RDP_Params, ST_Params
 
 end # module
