@@ -1,5 +1,9 @@
 module LatentOrderBookModel
 
-greet() = print("Hello World!")
+include("main.jl")
+
+export main
+
+
 
 end # module
