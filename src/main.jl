@@ -1,11 +1,12 @@
 using Plots
 using Random
+using ArgParse
 
 include("reaction_diffusion_path.jl")
-include("preprocess_bar_data.jl")
+# include("preprocess_bar_data.jl")
 
 
-bar_data = process_bar_data("data/Original_Price_Bars_2300.csv")
+# bar_data = process_bar_data("data/Original_Price_Bars_2300.csv")
 
 
 # mutable struct RDP_Params
@@ -24,22 +25,83 @@ bar_data = process_bar_data("data/Original_Price_Bars_2300.csv")
 #     λ::Float64
 #     μ::Float64
 # end
-bar_data.price
-using Statistics
-std(bar_data.price)
-rdp_params = RDP_Params(
-    2300, 10, 238.745,
-    501, 2, 7.415, 0.001,
-    5.0, 0.001)
-st_params = ST_Params(1.0, 0.5)
 
-seed = 445784574
-Random.seed!(seed)
+using ArgParse
 
-sim_price_path = reaction_diffusion_path(
-    rdp_params,
-    st_params)
+function parse_commandline()
+    s = ArgParseSettings()
 
+    @add_arg_table s begin
+        "SEED"
+            help = "Seed for randomness"
+            required = true
+            arg_type = Int
+        "T"
+            help = "Number of time periods"
+            required = true
+            arg_type = Int
+        "τ"
+            required = true
+            arg_type = Int
+        "initial_mid_price"
+            required = true
+            arg_type = Float64
+        "n_spatial_points"
+            required = true
+            arg_type = Int
+        "boltz_const"
+            required = true
+            arg_type = Float64
+        "sample_std"
+            required = true
+            arg_type = Float64
+        "σ"
+            required = true
+            arg_type = Float64
+        "D"
+            required = true
+            arg_type = Float64
+        "η"
+            required = true
+            arg_type = Float64
+        "λ"
+            required = true
+            arg_type = Float64
+        "μ"
+            required = true
+            arg_type = Float64
+    end
 
-plot(1:2300, sim_price_path)
-plot!(1:2300, bar_data.price)
+    return parse_args(s)
+end
+
+function main()
+    parsed_args = parse_commandline()
+    rdp_params = RDP_Params(
+        parsed_args["T"], parsed_args["τ"], parsed_args["initial_mid_price"],
+        parsed_args["n_spatial_points"], parsed_args["boltz_const"],
+        parsed_args["sample_std"], parsed_args["σ"], parsed_args["D"],
+        parsed_args["η"])
+    st_params = ST_Params(parsed_args["λ"], parsed_args["μ"])
+    Random.seed!(parsed_args["SEED"])
+    print(reaction_diffusion_path(
+        rdp_params,
+        st_params))
+end
+
+main()
+
+# rdp_params = RDP_Params(
+#     2300, 10, 238.745, 501, 2, 7.415, 0.001, 5.0, 0.001, 1.0, 0.5)
+# st_params = ST_Params(1.0, 0.5)
+#
+# seed = 445784574
+# Random.seed!(seed)
+#
+# sim_price_path = reaction_diffusion_path(
+#     rdp_params,
+#     st_params)
+#
+#
+# plot(1:2300, sim_price_path)
+# plot!(1:2300, bar_data.price)
