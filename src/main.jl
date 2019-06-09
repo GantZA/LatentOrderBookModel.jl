@@ -1,4 +1,3 @@
-using Random
 using ArgParse
 
 include("reaction_diffusion_path.jl")
@@ -29,7 +28,7 @@ function parse_commandline()
     s = ArgParseSettings()
 
     @add_arg_table s begin
-        "SEED"
+        "seed"
             help = "Seed for randomness"
             required = true
             arg_type = Int
@@ -75,18 +74,17 @@ end
 function main()
     parsed_args = parse_commandline()
     rdp_params = RDP_Params(
+        parse_args["seed"],
         parsed_args["T"], parsed_args["τ"], parsed_args["initial_mid_price"],
         parsed_args["n_spatial_points"], parsed_args["boltz_const"],
         parsed_args["sample_std"], parsed_args["σ"], parsed_args["D"],
         parsed_args["η"])
     st_params = ST_Params(parsed_args["λ"], parsed_args["μ"])
-    Random.seed!(parsed_args["SEED"])
     print(reaction_diffusion_path(
         rdp_params,
         st_params))
 end
 
-main()
 
 # rdp_params = RDP_Params(
 #     2300, 10, 238.745, 501, 2, 7.415, 0.001, 5.0, 0.001, 1.0, 0.5)

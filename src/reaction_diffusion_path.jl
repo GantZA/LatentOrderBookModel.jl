@@ -1,5 +1,6 @@
 using Statistics
 using Distributions
+using Random
 
 include("reaction_diffusion_spde.jl")
 
@@ -12,6 +13,7 @@ include("reaction_diffusion_spde.jl")
 
 
 mutable struct RDP_Params
+    SEED::Int64
     T::Int64
     τ::Int64
     initial_mid_price::Float64
@@ -24,6 +26,8 @@ mutable struct RDP_Params
 end
 
 function reaction_diffusion_path(rdp_params, st_params)
+
+    Random.seed!(rdp_params.SEED)
 
     # get reaction diffusion path parameters from rdp_params
     p0          = rdp_params.initial_mid_price
