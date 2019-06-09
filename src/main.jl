@@ -1,4 +1,3 @@
-using Plots
 using Random
 using ArgParse
 
@@ -25,8 +24,6 @@ include("reaction_diffusion_path.jl")
 #     λ::Float64
 #     μ::Float64
 # end
-
-using ArgParse
 
 function parse_commandline()
     s = ArgParseSettings()
