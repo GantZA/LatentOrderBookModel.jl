@@ -20,8 +20,9 @@ julia> reaction_diffusion_path(45, 2300, 10, 238.745, 501, 2, 7.415, 0.001, 5.0,
 ```
 
 ### Shell
-
-`$ julia src/main.jl 45 2300 10 238.745 501 2 7.415 0.001 5.0 0.001 1.0 0.5`
+```
+$ julia src/main.jl 45 2300 10 238.745 501 2 7.415 0.001 5.0 0.001 1.0 0.5
+```
 
 ### Compile using PackageCompiler.jl (requires master version)
 
