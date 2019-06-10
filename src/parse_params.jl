@@ -1,4 +1,4 @@
-using ArgParser
+using ArgParse
 
 function parse_commandline()
     s = ArgParseSettings()
