@@ -1,6 +1,8 @@
+module LOBMExec
+
 using LatentOrderBookModel
 
-function main()
+Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
     parsed_args = parse_commandline()
     rdp_params = RDP_Params(
         parsed_args["SEED"],
@@ -12,6 +14,8 @@ function main()
     print(reaction_diffusion_path(
         rdp_params,
         st_params))
+    return 0
 end
 
-main()
+
+end  

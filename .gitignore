@@ -32,4 +32,7 @@ Manifest.toml
 # Data folders
 data/
 
+# build dir
+builddir/
+
 # End of https://www.gitignore.io/api/julia
