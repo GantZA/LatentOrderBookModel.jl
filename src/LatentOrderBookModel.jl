@@ -1,6 +1,8 @@
 module LatentOrderBookModel
 
 include("reaction_diffusion_path.jl")
+include("parse_params.jl")
+
 
 reaction_diffusion_path(SEED::Int64, T::Int64, τ::Int64,
     initial_mid_price::Float64, n_spatial_points::Int64, boltz_const::Int64,
@@ -9,6 +11,6 @@ reaction_diffusion_path(SEED::Int64, T::Int64, τ::Int64,
     reaction_diffusion_path(RDP_Params(SEED, T, τ, initial_mid_price,
     n_spatial_points, boltz_const, sample_std, σ, D, η), ST_Params(λ, μ))
 
-export reaction_diffusion_path, RDP_Params, ST_Params
+export reaction_diffusion_path, RDP_Params, ST_Params, parse_commandline
 
 end # module

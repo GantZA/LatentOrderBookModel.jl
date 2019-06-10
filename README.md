@@ -34,6 +34,6 @@ julia> PackageCompiler.compile_package("ArgParser" ,"LatentOrderBookModel")
 ```
 After the Julia image has been compiled
 ```
-julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 2300 10 .001 5.0 0.001 1.0 0.5
+julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 2300 10 238.745 501 2 7.415 0.001 5.0 0.001 1.0 0.5
 
 ```
