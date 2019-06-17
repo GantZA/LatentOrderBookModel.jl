@@ -11,7 +11,11 @@ julia> ] add https://github.com/GantZA/LatentOrderBookModel.jl
 
 ## Arguments
 
-The `reaction_diffusion_path()` function can be called directly in Julia, by running `src/main.jl` or by executing `lobm_exec`. Their inputs are the same postional arguments which are:
+The `reaction_diffusion_path()` function can be evaluated in 3 ways: 
+1) directly in Julia
+2) Running `src/main.jl` 
+3) executing `lobm_exec`. 
+Their inputs are the same postional arguments which are:
 * SEED::Integer - The seed used for any random number generation. This ensures that paths are reproducible.
 * T::Integer - Number of time periods that are simulated
 * $\tau$::Integer - Number of time periods that the DTWR solver uses. 
