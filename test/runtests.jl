@@ -1,6 +1,8 @@
 using LatentOrderBookModel
 using Test
 
+include("../src/main.jl")
+
 @testset "All Tests" begin
 
     @testset "Reproducibility" begin
@@ -21,4 +23,22 @@ using Test
         @test size(reaction_diffusion_path(),1) == 100
     end;
 
+    @testset "Command Line Parse Default Arguments" begin
+        @test parse_commandline() == Dict("μ" => 0.5,
+            "T" => 100,
+            "initial_mid_price" => 100.0,
+            "λ" => 1.0,
+            "σ" => 0.001,
+            "SEED" => 1,
+            "boltz_const" => 2.0,
+            "η" => 0.001,
+            "D" => 5.0,
+            "n_spatial_points" => 101,
+            "τ" => 10,
+            "sample_std" => 4.0)
+    end
+
+    @testset "Main Default Arguments" begin
+        @test all(main("return") .== reaction_diffusion_path())
+    end
 end
