@@ -4,10 +4,10 @@ include("reaction_diffusion_path.jl")
 include("parse_params.jl")
 
 
-reaction_diffusion_path(SEED::Int64, T::Int64, τ::Int64,
-    initial_mid_price::Float64, n_spatial_points::Int64, boltz_const::Int64,
-    sample_std::Float64, σ::Float64, D::Float64, η::Float64, λ::Float64,
-    μ::Float64) =
+reaction_diffusion_path(SEED::Int64=1, T::Int64=100, τ::Int64=10,
+    initial_mid_price::Real=100.0, n_spatial_points::Int64=101, boltz_const::Real=2.0,
+    sample_std::Real=4.0, σ::Real=0.001, D::Real=5.0, η::Real=0.001, λ::Real=1.0,
+    μ::Real=0.5) =
     reaction_diffusion_path(RDP_Params(SEED, T, τ, initial_mid_price,
     n_spatial_points, boltz_const, sample_std, σ, D, η), ST_Params(λ, μ))
 
