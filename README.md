@@ -15,19 +15,20 @@ The `reaction_diffusion_path()` function can be evaluated in 3 ways:
 1) directly in Julia
 2) Running `src/main.jl` 
 3) executing `lobm_exec`. 
+
 Their inputs are the same postional arguments which are:
 * SEED::Integer - The seed used for any random number generation. This ensures that paths are reproducible.
 * T::Integer - Number of time periods that are simulated
-* $\tau$::Integer - Number of time periods that the DTWR solver uses. 
+* \tau::Integer - Number of time periods that the DTWR solver uses. 
 * initial_mid_price::Float - The inital price that the simulation begins at
 * n_spatial_points::Integer - The number of discretized price points used to solve the SPDE
 * boltz_const::Float - The Boltzmann constant used in calcualting the Boltzmann Potential
 * sample_std::Float - The sample standard deviation of the price path. Used to find an upper and lower bound for the discretized price grid.
-* $\sigma$::Float - The standard deviation of the Advection Normal(mean=0) Random Variable.   
+* \sigma::Float - The standard deviation of the Advection Normal(mean=0) Random Variable.   
 * D::Float - The Diffusion coefficient in the SPDE
-* $\eta$::Float - The latent order cancellation rate.
-* $\lambda$::Float - Source Term function parameter 1
-* $\mu$::Float - Source Term function parameter 2
+* \eta::Float - The latent order cancellation rate.
+* \lambda::Float - Source Term function parameter 1
+* \mu::Float - Source Term function parameter 2
 ## Example Usage
 
 ### Julia Terminal
