@@ -16,7 +16,7 @@ The `reaction_diffusion_path()` function can be evaluated in 3 ways:
 2) Running `src/main.jl`
 3) executing `lobm_exec`.
 
-Their inputs are the same positional arguments which are:
+Each method uses the same positional arguments which are:
 * SEED :: Integer - The seed used for any random number generation. This ensures that paths are reproducible.
 * T :: Integer - Number of time periods that are simulated
 * τ :: Integer - Number of time periods that the DTWR solver uses.
