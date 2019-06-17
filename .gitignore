@@ -35,4 +35,7 @@ data/
 # build dir
 builddir/
 
+# benchmarking scripts
+benchmarking.jl
+
 # End of https://www.gitignore.io/api/julia
