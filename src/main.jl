@@ -14,4 +14,6 @@ function main()
         st_params))
 end
 
-main()
+if ""!=PROGRAM_FILE && realpath(@__FILE__) == realpath(PROGRAM_FILE)
+    main()
+end
