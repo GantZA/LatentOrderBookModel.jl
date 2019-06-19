@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/GantZA/LatentOrderBookModel.jl.svg?branch=master)](https://travis-ci.org/GantZA/LatentOrderBookModel.jl)
 [![Coverage Status](https://coveralls.io/repos/github/GantZA/LatentOrderBookModel.jl/badge.svg?branch=master)](https://coveralls.io/github/GantZA/LatentOrderBookModel.jl?branch=master)
 
+# A Discretised Model of the Latent-Order Book Implemented in Julia
+
 ## Authors
 * Michael Gant
 * Tim Gebbie 
