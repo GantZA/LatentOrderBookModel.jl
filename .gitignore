@@ -38,4 +38,7 @@ builddir/
 # benchmarking scripts
 benchmarking.jl
 
+# examples and scratch scripts
+examples/
+
 # End of https://www.gitignore.io/api/julia
