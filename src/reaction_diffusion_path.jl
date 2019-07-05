@@ -27,8 +27,11 @@ end
 
 function reaction_diffusion_path(rdp_params, st_params)
 
-    Random.seed!(rdp_params.SEED)
-
+    if rdp_params.SEED == -1
+        Random.seed!()
+    else
+        Random.seed!(rdp_params.SEED)
+    end
     # get reaction diffusion path parameters from rdp_params
     p0          = rdp_params.initial_mid_price
     T           = rdp_params.T
