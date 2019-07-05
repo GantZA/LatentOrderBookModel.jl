@@ -26,7 +26,7 @@ The `reaction_diffusion_path()` function can be evaluated in 3 ways:
 3) executing `lobm_exec`.
 
 Each method uses the same positional arguments which are:
-* SEED :: Integer - The seed used for any random number generation. This ensures that paths are reproducible.
+* SEED :: Integer - The seed used for any random number generation. This ensures that paths are reproducible. A value of -1 will generate and use a random seed.
 * T :: Integer - Number of time periods that are simulated
 * τ :: Integer - Number of time periods that the DTWR solver uses.
 * initial_mid_price :: Float - The initial price that the simulation begins at
