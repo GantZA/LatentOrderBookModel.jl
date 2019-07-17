@@ -10,7 +10,6 @@ mutable struct DTRW_RD_Params
     x::Array{Float64,1}
     advective_coeff::Float64
     mid_price::Float64
-    α::Float64
 end
 
 
