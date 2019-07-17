@@ -7,7 +7,7 @@ function main(output="stdout")
         parsed_args["T"], parsed_args["τ"], parsed_args["initial_mid_price"],
         parsed_args["n_spatial_points"], parsed_args["boltz_const"],
         parsed_args["sample_std"], parsed_args["σ"], parsed_args["D"],
-        parsed_args["η"])
+        parsed_args["ν"])
     st_params = ST_Params(parsed_args["λ"], parsed_args["μ"])
     if output=="stdout"
         print(reaction_diffusion_path(

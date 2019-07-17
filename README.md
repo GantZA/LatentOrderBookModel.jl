@@ -35,7 +35,7 @@ Each method uses the same positional arguments which are:
 * sample_std :: Float - The sample standard deviation of the price path. Used to find an upper and lower bound for the discretized price grid.
 * σ :: Float - The standard deviation of the Advection Normal(mean=0) Random Variable.   
 * D :: Float - The Diffusion coefficient in the SPDE
-* η :: Float - The latent order cancellation rate.
+* ν :: Float - The latent order cancellation rate.
 * λ :: Float - Source Term function parameter 1
 * μ :: Float - Source Term function parameter 2
 ## Example Usage

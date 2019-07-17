@@ -31,7 +31,7 @@ include("../src/main.jl")
             "σ" => 0.001,
             "SEED" => 1,
             "boltz_const" => 2.0,
-            "η" => 0.001,
+            "ν" => 0.001,
             "D" => 5.0,
             "n_spatial_points" => 101,
             "τ" => 10,

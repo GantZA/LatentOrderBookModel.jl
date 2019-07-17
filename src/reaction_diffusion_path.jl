@@ -22,7 +22,7 @@ mutable struct RDP_Params
     sample_std::Float64
     σ::Float64
     D::Float64
-    η::Float64
+    ν::Float64
 end
 
 function reaction_diffusion_path(rdp_params, st_params)
@@ -40,7 +40,7 @@ function reaction_diffusion_path(rdp_params, st_params)
     β           = rdp_params.boltz_const
     n           = rdp_params.n_spatial_points
     D           = rdp_params.D
-    η           = rdp_params.η
+    ν           = rdp_params.ν
     τ           = rdp_params.τ
 
     # construct vector of simulated prices, filling with p0

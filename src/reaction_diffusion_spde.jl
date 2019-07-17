@@ -3,7 +3,7 @@ using LinearAlgebra
 include("source_function.jl")
 
 # SPDE
-# ϱₜ = -Vₜ * ϱₓ + D * ϱₓₓ - η * ϱ(x,t) + λ * tanh(μ * (p(t) - x))
+# ϱₜ = -Vₜ * ϱₓ + D * ϱₓₓ - ν * ϱ(x,t) + λ * tanh(μ * (p(t) - x))
 
 mutable struct DTRW_RD_Params
     a_b::Array{Float64,1}
@@ -24,12 +24,12 @@ function get_initial_conditions(dtrw_params, rdp_params, st_params)
     V₀          = dtrw_params.advective_coeff
     D           = rdp_params.D
     mid_price   = dtrw_params.mid_price
-    η           = rdp_params.η
+    ν           = rdp_params.ν
 
     Δx = (b - a)/(n-1)
     A = Tridiagonal(
         (V₀/(2*Δx) + D/(Δx^2)) * ones(n-1),
-        ((-2*D)/(Δx^2) - η) * ones(n),
+        ((-2*D)/(Δx^2) - ν) * ones(n),
         (-V₀/(2*Δx) + D/(Δx^2)) * ones(n-1))
 
     A[1,2] = 2*D/Δx^2
@@ -42,7 +42,7 @@ function get_initial_conditions(dtrw_params, rdp_params, st_params)
 end
 
 function DTRW_reaction_diffusion( dtrw_params, rdp_params, st_params)
-    #ϱₜ = -Vₜ * ϱₓ + D * ϱₓₓ - η * ϱ(x,t) + λ * tanh(μ * (p(t) - x))
+    #ϱₜ = -Vₜ * ϱₓ + D * ϱₓₓ - ν * ϱ(x,t) + λ * tanh(μ * (p(t) - x))
 
     # get reaction diffusion path parameters from rdp_params
     a,b         = dtrw_params.a_b
@@ -52,7 +52,7 @@ function DTRW_reaction_diffusion( dtrw_params, rdp_params, st_params)
     β           = rdp_params.boltz_const
     n           = rdp_params.n_spatial_points
     D           = rdp_params.D
-    η           = rdp_params.η
+    ν           = rdp_params.ν
     τ           = rdp_params.τ
 
     u0 = get_initial_conditions(dtrw_params, rdp_params, st_params)
@@ -81,14 +81,14 @@ function DTRW_reaction_diffusion( dtrw_params, rdp_params, st_params)
         # Compute new boundary value at 'a'
         u[1] = jump_prob_left[1] * u0[1] +
             jump_prob_left[2] * u0[2] +
-            jump_prob_self[1] * u0[1] - η * u0[1] +
+            jump_prob_self[1] * u0[1] - ν * u0[1] +
             source_term(x[1], st_params, mid_price)
 
         # Compute Interior Points
         u[2:end-1] = jump_prob_right[1:end-2] .* u0[1:end-2] +
             jump_prob_left[3:end] .* u0[3:end] +
             jump_prob_self[2:end-1] .* u0[2:end-1] -
-            η * u0[2:end-1] +
+            ν * u0[2:end-1] +
             [source_term(xᵢ, st_params, mid_price) for xᵢ in x[2:end-1]]
 
         # The 'mass' at site 'j' at the next time step is the mass at 'j-1'
@@ -100,7 +100,7 @@ function DTRW_reaction_diffusion( dtrw_params, rdp_params, st_params)
         u[end] = jump_prob_right[end-1] * u0[end-1] +
             jump_prob_right[end] * u0[end] +
             jump_prob_self[end] * u0[end] -
-            η * u0[end] + source_term(x[end], st_params, mid_price)
+            ν * u0[end] + source_term(x[end], st_params, mid_price)
 
         u0 = u[:]
     end
@@ -108,7 +108,7 @@ function DTRW_reaction_diffusion( dtrw_params, rdp_params, st_params)
 end
 
 
-# a,b,D,V₀, η, source_params, β, p0, n, T
+# a,b,D,V₀, ν, source_params, β, p0, n, T
 #@benchmark DTRW_reaction_diffusion(1,100,5.0,0.0,0.5,0.5,0.5,1.0,5.0,1,10,100)
 # u = DTRW_reaction_diffusion(1,100,5.0,0.1,0.01,[1.0,0.5],2.0,50.5,201,20)
 # # Juno.@enter DTRW_reaction_diffusion(1,100,5.0,0.9,0.5,[1.5,0.5],1.0,50.5,200,10)
