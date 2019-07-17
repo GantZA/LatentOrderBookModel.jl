@@ -23,6 +23,7 @@ mutable struct RDP_Params
     σ::Float64
     D::Float64
     ν::Float64
+    α::Float64
 end
 
 function reaction_diffusion_path(rdp_params, st_params)

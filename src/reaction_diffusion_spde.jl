@@ -10,6 +10,7 @@ mutable struct DTRW_RD_Params
     x::Array{Float64,1}
     advective_coeff::Float64
     mid_price::Float64
+    α::Float64
 end
 
 
@@ -54,6 +55,7 @@ function DTRW_reaction_diffusion( dtrw_params, rdp_params, st_params)
     D           = rdp_params.D
     ν           = rdp_params.ν
     τ           = rdp_params.τ
+    α           = rdp_params.α
 
     u0 = get_initial_conditions(dtrw_params, rdp_params, st_params)
     u = u0[:]
@@ -63,8 +65,8 @@ function DTRW_reaction_diffusion( dtrw_params, rdp_params, st_params)
     # Simulate PDE
     for i = 1:τ
         ϵ = rand(Normal(0,1))
-        Vₜ = stochastic_drift(0.0,1.0,ϵ)
-        V = -Vₜ*x/(2*D*β)
+        Vₜ = stochastic_drift(0.0,α,ϵ)
+        V = -Vₜ*x/(2*D)
 
         jump_prob_right = vcat(exp.(-β*V[2:end]),exp(-β*V[end]))
         jump_prob_self = exp.(-β*V)

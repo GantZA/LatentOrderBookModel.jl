@@ -23,7 +23,7 @@ function parse_commandline()
             default = 101
         "boltz_const"
             arg_type = Float64
-            default = 2.0
+            default = 1.0
         "sample_std"
             arg_type = Float64
             default = 4.0
@@ -36,6 +36,9 @@ function parse_commandline()
         "ν"
             arg_type = Float64
             default = 0.001
+        "α"
+            arg_type = Float64
+            default = 1.0        
         "λ"
             arg_type = Float64
             default = 1.0

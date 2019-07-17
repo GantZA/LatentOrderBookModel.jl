@@ -5,7 +5,7 @@
 
 ## Authors
 * Michael Gant
-* Tim Gebbie 
+* Tim Gebbie
 
 ## Acknowledgements
 
@@ -33,9 +33,10 @@ Each method uses the same positional arguments which are:
 * n_spatial_points :: Integer - The number of discretized price points used to solve the SPDE
 * boltz_const :: Float - The Boltzmann constant used in calculating the Boltzmann Potential
 * sample_std :: Float - The sample standard deviation of the price path. Used to find an upper and lower bound for the discretized price grid.
-* σ :: Float - The standard deviation of the Advection Normal(mean=0) Random Variable.   
+* σ :: Float - The standard deviation of the Advection Normal(mean=0) Random Variable
 * D :: Float - The Diffusion coefficient in the SPDE
-* ν :: Float - The latent order cancellation rate.
+* ν :: Float - The latent order cancellation rate
+* α :: Float - The scaling value for the Stochastic Drift term
 * λ :: Float - Source Term function parameter 1
 * μ :: Float - Source Term function parameter 2
 ## Example Usage
@@ -44,13 +45,13 @@ Each method uses the same positional arguments which are:
 
 ```
 julia> using LatentOrderBookModel
-julia> reaction_diffusion_path(45, 2300, 10, 238.745, 501, 2, 7.415, 0.001, 5.0, 0.001, 1.0, 0.5)
+julia> reaction_diffusion_path(45, 2300, 10, 238.745, 501, 2, 7.415, 0.001, 5.0, 0.001, 1.0, 1.0, 0.5)
 
 ```
 
 ### Shell
 ```
-$ julia src/main.jl 45 2300 10 238.745 501 2 7.415 0.001 5.0 0.001 1.0 0.5
+$ julia src/main.jl 45 2300 10 238.745 501 2 7.415 0.001 5.0 0.001 1.0 1.0 0.5
 ```
 
 ### Compile using PackageCompiler.jl (requires master version)
@@ -63,7 +64,7 @@ julia> PackageCompiler.compile_package("ArgParser" ,"LatentOrderBookModel")
 ```
 After the Julia image has been compiled
 ```
-julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 2300 10 238.745 501 2 7.415 0.001 5.0 0.001 1.0 0.5
+julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 2300 10 238.745 501 2 7.415 0.001 5.0 0.001 1.0 1.0 0.5
 
 ```
 
@@ -78,5 +79,5 @@ julia> build_executable("lobm_exec.jl", "lobm_exec")
 ```
 After the executable has been successfully built
 ```
-$ ./builddir/lobm_exec 45 2300 10 238.745 501 2 7.415 0.001 5.0 0.001 1.0 0.5
+$ ./builddir/lobm_exec 45 2300 10 238.745 501 2 7.415 0.001 5.0 0.001 1.0 1.0 0.5
 ```
