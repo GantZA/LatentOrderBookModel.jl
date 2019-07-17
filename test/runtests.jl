@@ -4,23 +4,21 @@ using Test
 include("../src/main.jl")
 
 @testset "All Tests" begin
-
+    rdpp = ReactionDiffusionPricePath()
     @testset "Reproducibility" begin
-        @test all(reaction_diffusion_path(45, 2300, 10, 238.745, 501, 2.0, 7.415,
-            0.001, 5.0, 0.001, 1.0, 1.0, 0.5) .== reaction_diffusion_path(45, 2300,
-            10, 238.745, 501, 2.0, 7.415, 0.001, 5.0, 0.001, 1.0, 1.0, 0.5))
+        rdpp_1 = ReactionDiffusionPricePath(2300, 10, 238.745, 501, 2.0, 7.415,
+            0.001, 5.0, 0.001, 1.0, 1.0, 0.5)
+        rdpp_2 = ReactionDiffusionPricePath(2300, 10, 238.745, 501, 2.0, 7.415,
+            0.001, 5.0, 0.001, 1.0, 1.0, 0.5)
+        @test all(rdpp_1(45) .== rdpp_2(45))
 
-        @test all(reaction_diffusion_path(51, 2300, 10, 238.745, 501, 2.0, 7.415,
-            0.001, 5.0, 0.001, 1.0, 1.0, 0.5) .== reaction_diffusion_path(51, 2300,
-            10, 238.745, 501, 2, 7.415, 0.001, 5.0, 0.001, 1.0, 1.0, 0.5))
+        @test all(rdpp_1(51) .== rdpp_2(51))
 
-        @test any(reaction_diffusion_path(45, 2300, 10, 238.745, 501, 2.0, 7.415,
-            0.001, 5.0, 0.001, 1.0, 1.0, 0.5) .!= reaction_diffusion_path(51, 2300,
-            10, 238.745, 501, 2.0, 7.415, 0.001, 5.0, 0.001, 1.0, 1.0, 0.5))
+        @test all(rdpp_1(4565756745) .== rdpp_2(4565756745))
     end;
 
     @testset "Default Values" begin
-        @test size(reaction_diffusion_path(),1) == 100
+        @test size(rdpp(),1) == 100
     end;
 
     @testset "Command Line Parse Default Arguments" begin
@@ -40,6 +38,7 @@ include("../src/main.jl")
     end
 
     @testset "Main Default Arguments" begin
-        @test all(main("return") .== reaction_diffusion_path())
+
+        @test all(main("return") .== rdpp(1))
     end
 end
