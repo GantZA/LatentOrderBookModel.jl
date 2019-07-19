@@ -20,11 +20,11 @@ function (rdpp::ReactionDiffusionPricePath)(seed::Int=-1)
     end
     p = rdpp.initial_mid_price * ones(Float64, rdpp.T)
     for t in 1:rdpp.T-1
-        a = max(0, p[t] - 3*rdpp.sample_std)
-        b = p[t] + 3*rdpp.sample_std
+        a = max(0.0, p[t] - 3.0*rdpp.sample_std)
+        b = p[t] + 3.0*rdpp.sample_std
 
         # Price Grid
-        x = collect(range(a, b, length=rdpp.n_spatial_points))
+        x = collect(Float64, range(a, b, length=rdpp.n_spatial_points))
 
         dtrw_solver = DTRWSolver(a, b, x, p[t])
         U = dtrw_solver(rdpp)

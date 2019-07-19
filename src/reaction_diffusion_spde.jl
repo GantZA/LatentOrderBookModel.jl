@@ -5,14 +5,14 @@ using LinearAlgebra
 
 function initial_conditions(ds::DTRWSolver, rdpp::ReactionDiffusionPricePath)
     Δx = (ds.b - ds.a)/(rdpp.n_spatial_points-1)
-    V₀ = rand(Normal(0, rdpp.σ))
+    V₀ = rand(Normal(0.0, rdpp.σ))
     A = Tridiagonal(
-        (V₀/(2*Δx) + rdpp.D/(Δx^2)) * ones(rdpp.n_spatial_points-1),
-        ((-2*rdpp.D)/(Δx^2) - rdpp.ν) * ones(rdpp.n_spatial_points),
-        (-V₀/(2*Δx) + rdpp.D/(Δx^2)) * ones(rdpp.n_spatial_points-1))
+        (V₀/(2.0*Δx) + rdpp.D/(Δx^2.0)) * ones(Float64, rdpp.n_spatial_points-1),
+        ((-2.0*rdpp.D)/(Δx^2.0) - rdpp.ν) * ones(Float64, rdpp.n_spatial_points),
+        (-V₀/(2.0*Δx) + rdpp.D/(Δx^2.0)) * ones(Float64, rdpp.n_spatial_points-1))
 
-    A[1,2] = 2*rdpp.D/Δx^2
-    A[end, end-1] = 2*rdpp.D/Δx^2
+    A[1,2] = 2.0*rdpp.D/Δx^2
+    A[end, end-1] = 2.0*rdpp.D/Δx^2
 
     B = .-[rdpp.source_term(xᵢ, ds.mid_price) for xᵢ in ds.x]
 
@@ -25,13 +25,13 @@ function (ds::DTRWSolver)(rdpp::ReactionDiffusionPricePath)
     u0 = initial_conditions(ds, rdpp)
     u = u0[:]
     Δx = (ds.b - ds.a)/(rdpp.n_spatial_points-1)
-    Δt = (Δx^2) / (2*rdpp.D)
+    Δt = (Δx^2) / (2.0*rdpp.D)
 
     # Simulate PDE
-    for i = 1:rdpp.τ
-        ϵ = rand(Normal(0,1))
-        Vₜ = rdpp.α*ϵ
-        V = -Vₜ*ds.x/(2*rdpp.D)
+    ϵ = rand(Normal(0.0,1.0), rdpp.τ)
+    @inbounds for i = 1:rdpp.τ
+        Vₜ = rdpp.α*ϵ[i]
+        V = -Vₜ*ds.x/(2.0*rdpp.D)
 
         jump_prob_right = vcat(exp.(-rdpp.β*V[2:end]),exp(-rdpp.β*V[end]))
         jump_prob_self = exp.(-rdpp.β*V)
@@ -74,18 +74,3 @@ function (ds::DTRWSolver)(rdpp::ReactionDiffusionPricePath)
     return u
 
 end
-
-
-# a,b,D,V₀, ν, source_params, β, p0, n, T
-#@benchmark DTRW_reaction_diffusion(1,100,5.0,0.0,0.5,0.5,0.5,1.0,5.0,1,10,100)
-# u = DTRW_reaction_diffusion(1,100,5.0,0.1,0.01,[1.0,0.5],2.0,50.5,201,20)
-# # Juno.@enter DTRW_reaction_diffusion(1,100,5.0,0.9,0.5,[1.5,0.5],1.0,50.5,200,10)
-# plot(1:201, u)
-# # 1+100
-# argmin(abs.(u))
-
-# u0 = get_initial_conditions(1,100,0.01,5.0, 0.001, [1.0,0.5], 50.5, 2001)
-# plot(1:size(u0,1), u0)
-# u0[1001]
-# u0[1002]
-# u0[1000]
