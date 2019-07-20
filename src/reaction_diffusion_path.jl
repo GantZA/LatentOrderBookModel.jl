@@ -9,9 +9,6 @@ using Random
 # where T is the number of measured prices stored in the loaded
 # ObjectiveFunction object.
 
-
-
-
 function (rdpp::ReactionDiffusionPricePath)(seed::Int=-1)
     if seed == -1
             Random.seed!()
