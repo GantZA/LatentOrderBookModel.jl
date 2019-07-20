@@ -45,5 +45,4 @@ mutable struct ObjectiveSurface
     surface_points::Int64
     replications::Int64
     params::Dict{String, Any}
-    log_prices::Array{Float64,1}
 end
