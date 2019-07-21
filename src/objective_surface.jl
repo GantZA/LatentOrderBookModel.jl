@@ -1,4 +1,4 @@
-using SharedArray
+using SharedArrays
 
 function (os::ObjectiveSurface)(seed, para=false)
     iterations = os.surface_points^2 * os.replications
