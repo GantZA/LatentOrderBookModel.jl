@@ -7,7 +7,7 @@ function (os::ObjectiveSurface)(seed, para=false)
     seeds = Int.(rand(MersenneTwister(seed), UInt32, iterations))
     if para==true
         price_paths = SharedArray{Float32,2}((os.params["T"], iterations))
-        @sync Distributed.@distributed for i in 1:iterations
+        @sync @distributed for i in 1:iterations
             os.params[os.param1_name] = os.param1_values[i]
             os.params[os.param2_name] = os.param2_values[i]
             rdpp = ReactionDiffusionPricePath(os.params)
