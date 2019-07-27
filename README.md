@@ -20,12 +20,13 @@ julia> ] add https://github.com/GantZA/LatentOrderBookModel.jl
 
 ## Arguments
 
-The `reaction_diffusion_path()` function can be evaluated in 3 ways:
-1) directly in Julia
-2) Running `src/main.jl`
-3) executing `lobm_exec`.
+The `ReactionDiffusionPricePath` struct is created by instantiating the struct with the relevant parameters. Once instantiated, the object can be called as a function, with a seed as the only argument and a price path will be generated.
 
-Each method uses the same positional arguments which are:
+There are 2 command line interfaces which can be accesed. The commands and arguments are detailed below.
+1) Running `$ julia src/main.jl arg1 arg2 ...`
+2) After building the executable, `lobm_exec arg1 arg2 ...`
+
+Each interface uses the same positional arguments which are:
 * SEED :: Integer - The seed used for any random number generation. This ensures that paths are reproducible. A value of -1 will generate and use a random seed.
 * T :: Integer - Number of time periods that are simulated
 * τ :: Integer - Number of time periods that the DTWR solver uses.
@@ -45,7 +46,9 @@ Each method uses the same positional arguments which are:
 
 ```
 julia> using LatentOrderBookModel
-julia> reaction_diffusion_path(45, 2300, 10, 238.745, 501, 2, 7.415, 0.001, 5.0, 0.001, 1.0, 1.0, 0.5)
+julia> rdpp = ReactionDiffusionPricePath(T=2300, τ=10, initial_mid_price=238.745,
+  n_spatial_points=501, β=2.0, sample_std=7.415, σ=0.001, D=5.0, ν=0.001, α=1.0, λ=1.0, μ=0.5)
+julia> rdpp(seed=57)
 
 ```
 
@@ -68,7 +71,7 @@ julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 2300 10 238.7
 
 ```
 
-### Build Executable using PackageCompiler.jl
+### Build Executable using PackageCompiler.jl (requires master version)
 
 ```
 $ cd src
