@@ -34,7 +34,6 @@ Each interface uses the same positional arguments which are:
 * n_spatial_points :: Integer - The number of discretized price points used to solve the SPDE
 * boltz_const :: Float - The Boltzmann constant used in calculating the Boltzmann Potential
 * sample_std :: Float - The sample standard deviation of the price path. Used to find an upper and lower bound for the discretized price grid.
-* σ :: Float - The standard deviation of the Advection Normal(mean=0) Random Variable
 * D :: Float - The Diffusion coefficient in the SPDE
 * ν :: Float - The latent order cancellation rate
 * α :: Float - The scaling value for the Stochastic Drift term
@@ -47,7 +46,7 @@ Each interface uses the same positional arguments which are:
 ```
 julia> using LatentOrderBookModel
 julia> rdpp = ReactionDiffusionPricePath(T=2300, τ=10, initial_mid_price=238.745,
-  n_spatial_points=501, β=2.0, sample_std=7.415, σ=0.001, D=5.0, ν=0.001, α=1.0, λ=1.0, μ=0.5)
+  n_spatial_points=501, β=2.0, sample_std=7.415, D=5.0, ν=0.001, α=1.0, λ=1.0, μ=0.5)
 julia> rdpp(seed=57)
 
 ```

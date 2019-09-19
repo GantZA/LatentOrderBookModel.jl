@@ -26,7 +26,6 @@ include("../src/main.jl")
             "T" => 100,
             "initial_mid_price" => 100.0,
             "λ" => 1.0,
-            "σ" => 0.001,
             "SEED" => 1,
             "boltz_const" => 1.0,
             "ν" => 0.001,
