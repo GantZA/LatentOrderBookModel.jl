@@ -5,7 +5,7 @@ using LinearAlgebra
 
 function initial_conditions(ds::DTRWSolver, rdpp::ReactionDiffusionPricePath)
     Δx = (ds.b - ds.a)/(rdpp.n_spatial_points-1)
-    V₀ = rand(Normal(0.0, rdpp.σ))
+    V₀ = rdpp.α*rand(Normal(0.0, 1.0))
     A = Tridiagonal(
         (V₀/(2.0*Δx) + rdpp.D/(Δx^2.0)) * ones(Float64, rdpp.n_spatial_points-1),
         ((-2.0*rdpp.D)/(Δx^2.0) - rdpp.ν) * ones(Float64, rdpp.n_spatial_points),
