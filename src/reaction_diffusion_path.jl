@@ -24,10 +24,10 @@ function (rdpp::ReactionDiffusionPricePath)(seed::Int=-1)
         x = collect(Float64, range(a, b, length=rdpp.n_spatial_points))
 
         dtrw_solver = DTRWSolver(a, b, x, p[t])
-        U = dtrw_solver(rdpp)
+        U, p[t+1] = dtrw_solver(rdpp)
 
-        mid_price_ind = argmin(abs.(U))
-        p[t+1] = x[mid_price_ind]
+        # mid_price_ind = argmin(abs.(U))
+        # p[t+1] = x[mid_price_ind]
     end
     return p
 end
