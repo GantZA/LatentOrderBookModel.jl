@@ -30,7 +30,7 @@ function parse_commandline()
         "D"
             arg_type = Float64
             default = 5.0
-        "ν"
+        "nu"
             arg_type = Float64
             default = 0.001
         "α"
