@@ -1,5 +1,14 @@
-using SharedArrays
-using Distributed
+
+
+mutable struct ObjectiveSurface
+    param1_name::String
+    param1_values::Array{Any,1}
+    param2_name::String
+    param2_values::Array{Any,1}
+    surface_points::Int64
+    replications::Int64
+    params::Dict{String, Any}
+end
 
 function (os::ObjectiveSurface)(seed, para=false)
     iterations = os.surface_points^2 * os.replications

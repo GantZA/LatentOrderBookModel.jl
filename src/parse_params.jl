@@ -15,10 +15,10 @@ function parse_commandline()
         "τ"
             arg_type = Int
             default = 10
-        "initial_mid_price"
+        "m"
             arg_type = Float64
             default = 100.0
-        "n_spatial_points"
+        "m"
             arg_type = Int
             default = 101
         "boltz_const"
@@ -30,7 +30,7 @@ function parse_commandline()
         "D"
             arg_type = Float64
             default = 5.0
-        "ν"
+        "nu"
             arg_type = Float64
             default = 0.001
         "α"

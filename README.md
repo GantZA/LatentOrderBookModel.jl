@@ -30,12 +30,12 @@ Each interface uses the same positional arguments which are:
 * SEED :: Integer - The seed used for any random number generation. This ensures that paths are reproducible. A value of -1 will generate and use a random seed.
 * T :: Integer - Number of time periods that are simulated
 * τ :: Integer - Number of time periods that the DTWR solver uses.
-* initial_mid_price :: Float - The initial price that the simulation begins at
-* n_spatial_points :: Integer - The number of discretized price points used to solve the SPDE
+* m :: Float - The initial price that the simulation begins at
+* m :: Integer - The number of discretized price points used to solve the SPDE
 * boltz_const :: Float - The Boltzmann constant used in calculating the Boltzmann Potential
 * sample_std :: Float - The sample standard deviation of the price path. Used to find an upper and lower bound for the discretized price grid.
 * D :: Float - The Diffusion coefficient in the SPDE
-* ν :: Float - The latent order cancellation rate
+* nu :: Float - The latent order cancellation rate
 * α :: Float - The scaling value for the Stochastic Drift term
 * λ :: Float - Source Term function parameter 1
 * μ :: Float - Source Term function parameter 2
@@ -45,8 +45,8 @@ Each interface uses the same positional arguments which are:
 
 ```
 julia> using LatentOrderBookModel
-julia> rdpp = ReactionDiffusionPricePath(T=2300, τ=10, initial_mid_price=238.745,
-  n_spatial_points=501, β=2.0, sample_std=7.415, D=5.0, ν=0.001, α=1.0, λ=1.0, μ=0.5)
+julia> rdpp = ReactionDiffusionPricePath(T=2300, τ=10, m=238.745,
+  m=501, β=2.0, sample_std=7.415, D=5.0, nu=0.001, α=1.0, λ=1.0, μ=0.5)
 julia> rdpp(seed=57)
 
 ```
