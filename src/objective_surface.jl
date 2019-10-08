@@ -1,5 +1,4 @@
 
-
 mutable struct ObjectiveSurface
     param1_name::String
     param1_values::Array{Any,1}
