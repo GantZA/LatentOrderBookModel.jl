@@ -36,7 +36,7 @@ Each interface uses the same positional arguments which are:
 * sample_std :: Float - The sample standard deviation of the price path. Used to find an upper and lower bound for the discretized price grid.
 * D :: Float - The Diffusion coefficient in the SPDE
 * nu :: Float - The latent order cancellation rate
-* α :: Float - The scaling value for the Stochastic Drift term
+* σ :: Float - The scaling value for the Stochastic Drift term
 * λ :: Float - Source Term function parameter 1
 * μ :: Float - Source Term function parameter 2
 ## Example Usage
@@ -46,7 +46,7 @@ Each interface uses the same positional arguments which are:
 ```
 julia> using LatentOrderBookModel
 julia> rdpp = ReactionDiffusionPricePaths(T=2300, τ=10, initial_mid_price=238.745,
-  n_spatial_points=501, β=2.0, sample_std=7.415, D=5.0, nu=0.001, α=1.0, λ=1.0, μ=0.5)
+  n_spatial_points=501, β=2.0, sample_std=7.415, D=5.0, nu=0.001, σ=1.0, λ=1.0, μ=0.5)
 julia> rdpp(seed=57)
 
 ```
