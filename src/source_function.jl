@@ -17,6 +17,6 @@ mutable struct SourceTerm
 end
 
 
-function (st::SourceTerm)(x::Float64,p::Float64)
-    return st.λ*tanh(st.μ*(p-x))
+function (st::SourceTerm)(i::Int64,Δx::Float64,p::Float64)
+    return st.λ*tanh(st.μ*(p-(i+0.5)*Δx))
 end
