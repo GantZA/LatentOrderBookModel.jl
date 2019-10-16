@@ -15,7 +15,7 @@ function parse_commandline()
         "τ"
             arg_type = Int
             default = 10
-        "initial_mid_price"
+        "p₀"
             arg_type = Float64
             default = 100.0
         "n_spatial_points"
