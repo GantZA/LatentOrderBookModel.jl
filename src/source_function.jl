@@ -20,3 +20,7 @@ end
 function (st::SourceTerm)(x::Float64,p::Float64)
     return st.λ*(p-x)*exp(-st.μ*(p-x)^2)
 end
+
+# function (st::SourceTerm)(x::Float64,p::Float64)
+#     return st.λ*tanh(st.μ*(p-x))
+# end

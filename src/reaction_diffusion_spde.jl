@@ -20,7 +20,7 @@ end
 function initial_conditions_steady_state(rdpp::ReactionDiffusionPricePaths)
     φ = rdpp.source_term.λ / (2 * rdpp.source_term.μ * rdpp.D) .*
         [
-            (rdpp.p₀ - xᵢ)*exp(rdpp.source_term.μ * rdpp.p₀^2) -
+            (rdpp.p₀ - xᵢ)*exp(rdpp.source_term.μ * (rdpp.p₀ - xᵢ)^2) -
             0.5 * sqrt(pi/rdpp.source_term.μ) *
             erf(sqrt(rdpp.source_term.μ) * (rdpp.p₀ - xᵢ))
             for xᵢ in rdpp.x
@@ -35,18 +35,17 @@ function extract_mid_price(rdpp, lob_density)
     x2, y2 = rdpp.x[mid_price_ind+1], lob_density[mid_price_ind+1]
     m = (y1-y2)/(x1-x2)
     c = y1-m*x1
-    mid_price = -c/m
+    mid_price = round(-c/m, digits=2)
     return mid_price
 end
 
 
 function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
 
-
     φ = ones(Float64, rdpp.M+1, rdpp.T)
     φ[:,1] = initial_conditions_steady_state(rdpp)
     Δx = (rdpp.x[end] - rdpp.x[1])/(rdpp.M)
-    Δt = (Δx^2) / (2.0*rdpp.D*rdpp.β)
+    Δt = (Δx^2) / (2.0*rdpp.D)
 
     p =  ones(Float64, rdpp.T) * rdpp.p₀
     ϵ = rand(Normal(0.0,1.0), rdpp.T-1)
@@ -55,8 +54,7 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
     P⁻s = ones(Float64, rdpp.M+1, rdpp.T-1)
     # Simulate SPDE
     @inbounds for n = 1:rdpp.T-1
-
-        Vₜ = sign(ϵ[n]) * min(rdpp.σ*ϵ[n], Δx/Δt)
+        Vₜ =  sign(ϵ[n]) * min(abs(rdpp.σ*ϵ[n]), Δx/Δt)
         V = (-Vₜ .* rdpp.x) ./ (2.0*rdpp.D)
 
         P⁺ = vcat(exp.(-rdpp.β.*V[2:end]), exp(-rdpp.β*V[end]))
@@ -72,7 +70,7 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
         # Ps[:,n-1] = P
         P⁻s[:,n] = P⁻
 
-        φ₋₁ = (1-(Vₜ*Δx)/(2*rdpp.D))*φ[1,n]
+        φ₋₁ = (1+(Vₜ*Δx)/(2*rdpp.D))*φ[1,n]
         φₘ₊₁ = (1+(Vₜ*Δx)/(2*rdpp.D))*φ[end,n]
 
         P⁺₋₁ = P⁻[1]
