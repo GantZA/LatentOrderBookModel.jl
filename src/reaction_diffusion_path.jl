@@ -14,16 +14,17 @@ mutable struct ReactionDiffusionPricePaths
     sample_std::Float64
     D::Float64
     σ::Float64
+    nu::Float64
     source_term::SourceTerm
     x::Array{Float64, 1}
 end
 function ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
-    sample_std, D, σ, source_term)
+    sample_std, D, σ, nu, source_term)
     x₀ = max(0.0, p₀ - 3.0*sample_std)
     xₘ = p₀ + 3.0*sample_std
     x = collect(Float64, range(x₀, xₘ, length=M+1))
     return ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
-        sample_std, D, σ, source_term, x)
+        sample_std, D, σ, nu, source_term, x)
 end
 
 

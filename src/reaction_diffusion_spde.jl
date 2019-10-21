@@ -1,22 +1,3 @@
-function initial_conditions_solve(rdpp::ReactionDiffusionPricePaths)
-    Δx = (rdpp.x[end] - rdpp.x[1])/(rdpp.M)
-    V₀ = rdpp.σ*rand(Normal(0.0, 1.0))
-
-    # lower, middle, upper
-    A = Tridiagonal(
-        (V₀/(2.0*Δx) + rdpp.D/(Δx^2.0)) * ones(Float64, rdpp.M),
-        ((-2.0*rdpp.D)/(Δx^2.0)) * ones(Float64, rdpp.M+1),
-        (-V₀/(2.0*Δx) + rdpp.D/(Δx^2.0)) * ones(Float64, rdpp.M))
-
-    A[1,1] = - rdpp.D/(Δx^2.0) + V₀/(2.0*Δx)
-    A[end, end] = - rdpp.D/(Δx^2.0) - V₀/(2.0*Δx)
-
-    B = .-[rdpp.source_term(xᵢ, rdpp.p₀) for xᵢ in rdpp.x]
-
-    φ = A \ B
-    return φ
-end
-
 function initial_conditions_steady_state(rdpp::ReactionDiffusionPricePaths)
     φ = rdpp.source_term.λ / (2 * rdpp.source_term.μ * rdpp.D) .*
         [
@@ -70,25 +51,28 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
         # Ps[:,n-1] = P
         P⁻s[:,n] = P⁻
 
-        φ₋₁ = (1+(Vₜ*Δx)/(2*rdpp.D))*φ[1,n]
-        φₘ₊₁ = (1+(Vₜ*Δx)/(2*rdpp.D))*φ[end,n]
+        φ₋₁ = φ[1,n] * (1-(Vₜ*Δx)/rdpp.D)
+        φₘ₊₁ = φ[end,n] * (1+(Vₜ*Δx)/rdpp.D)
 
         P⁺₋₁ = P⁻[1]
         P⁻ₘ₊₁ = P⁺[end]
 
         φ[1,n+1] = P⁺₋₁ * φ₋₁ +
             P⁻[2] * φ[2,n] +
-            rdpp.source_term(rdpp.x[1], p[n])
+            exp(rdpp.nu*n*Δt) * rdpp.source_term(rdpp.x[1], p[n])
 
         φ[end,n+1] = P⁻ₘ₊₁ * φₘ₊₁ +
             P⁺[end-1] * φ[end-1,n] +
-            rdpp.source_term(rdpp.x[end], p[n])
+            exp(rdpp.nu*n*Δt) * rdpp.source_term(rdpp.x[end], p[n])
+
 
         # Compute Interior Points
         φ[2:end-1,n+1] = P⁺[1:end-2] .* φ[1:end-2,n] +
             P⁻[3:end] .* φ[3:end,n] +
-            [rdpp.source_term(xᵢ, p[n]) for xᵢ in rdpp.x[2:end-1]]
+            [exp(rdpp.nu*n*Δt) * rdpp.source_term(xᵢ, p[n])
+            for xᵢ in rdpp.x[2:end-1]]
 
+        φ[:,n+1] = exp(-rdpp.nu*n*Δt) .* φ[:,n+1]
         p[n+1] = extract_mid_price(rdpp, φ[:,n+1])
     end
 
