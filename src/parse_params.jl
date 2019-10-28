@@ -8,20 +8,22 @@ function parse_commandline()
             help = "Seed for randomness"
             arg_type = Int
             default = 1
+        "num_paths"
+            help = "Number of price paths to generate"
+            arg_type = Int
+            default = 1
         "T"
             help = "Number of time periods"
             arg_type = Int
             default = 100
-        "τ"
-            arg_type = Int
-            default = 10
-        "initial_mid_price"
+        "p₀"
             arg_type = Float64
             default = 100.0
-        "n_spatial_points"
+        "M"
+            help = "Number of price points"
             arg_type = Int
-            default = 101
-        "boltz_const"
+            default = 100
+        "β"
             arg_type = Float64
             default = 1.0
         "sample_std"
@@ -30,12 +32,12 @@ function parse_commandline()
         "D"
             arg_type = Float64
             default = 5.0
-        "ν"
+        "σ"
             arg_type = Float64
-            default = 0.001
-        "α"
+            default = 0.01
+        "nu"
             arg_type = Float64
-            default = 1.0
+            default = 0.0
         "λ"
             arg_type = Float64
             default = 1.0

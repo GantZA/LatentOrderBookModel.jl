@@ -1,76 +1,84 @@
-using LinearAlgebra
-
-# SPDE
-# ϱₜ = -Vₜ * ϱₓ + D * ϱₓₓ - ν * ϱ(x,t) + λ * tanh(μ * (p(t) - x))
-
-function initial_conditions(ds::DTRWSolver, rdpp::ReactionDiffusionPricePath)
-    Δx = (ds.b - ds.a)/(rdpp.n_spatial_points-1)
-    V₀ = rdpp.α*rand(Normal(0.0, 1.0))
-    A = Tridiagonal(
-        (V₀/(2.0*Δx) + rdpp.D/(Δx^2.0)) * ones(Float64, rdpp.n_spatial_points-1),
-        ((-2.0*rdpp.D)/(Δx^2.0) - rdpp.ν) * ones(Float64, rdpp.n_spatial_points),
-        (-V₀/(2.0*Δx) + rdpp.D/(Δx^2.0)) * ones(Float64, rdpp.n_spatial_points-1))
-
-    A[1,2] = 2.0*rdpp.D/Δx^2
-    A[end, end-1] = 2.0*rdpp.D/Δx^2
-
-    B = .-[rdpp.source_term(xᵢ, ds.mid_price) for xᵢ in ds.x]
-
-    U = A \ B
-    return U
+function initial_conditions_steady_state(rdpp::ReactionDiffusionPricePaths)
+    L = rdpp.x[end] - rdpp.x[1]
+    φ = [
+            (xᵢ-rdpp.p₀) * rdpp.source_term.λ/(2 * rdpp.D * rdpp.source_term.μ) * exp((-rdpp.source_term.μ * L^2) / 4) +
+            (sqrt(pi) * rdpp.source_term.λ * erf(sqrt(rdpp.source_term.μ) * (rdpp.p₀ - xᵢ)))/(4 * rdpp.D * rdpp.source_term.μ^(3/2))
+            for xᵢ in rdpp.x
+        ]
+    return φ
 end
 
-function (ds::DTRWSolver)(rdpp::ReactionDiffusionPricePath)
 
-    u0 = initial_conditions(ds, rdpp)
-    u = u0[:]
-    Δx = (ds.b - ds.a)/(rdpp.n_spatial_points-1)
+function extract_mid_price(rdpp, lob_density)
+    mid_price_ind = 2
+    while lob_density[mid_price_ind] > 0
+        mid_price_ind += 1
+    end
+    x1, y1 = rdpp.x[mid_price_ind-1], lob_density[mid_price_ind-1]
+    x2, y2 = rdpp.x[mid_price_ind], lob_density[mid_price_ind]
+    m = (y1-y2)/(x1-x2)
+    c = y1-m*x1
+    mid_price = round(-c/m, digits=2)
+    return mid_price
+end
+
+
+function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
+
+    φ = ones(Float64, rdpp.M+1, rdpp.T)
+    φ[:,1] = initial_conditions_steady_state(rdpp)
+    Δx = (rdpp.x[end] - rdpp.x[1])/(rdpp.M)
     Δt = (Δx^2) / (2.0*rdpp.D)
 
-    # Simulate PDE
-    ϵ = rand(Normal(0.0,1.0), rdpp.τ)
-    @inbounds for i = 1:rdpp.τ
-        Vₜ = rdpp.α*ϵ[i]
-        V = -Vₜ*ds.x/(2.0*rdpp.D)
+    p =  ones(Float64, rdpp.T) * rdpp.p₀
+    ϵ = rand(Normal(0.0,1.0), rdpp.T-1)
+    P⁺s = ones(Float64, rdpp.M+1, rdpp.T-1)
+    # Ps = ones(Float64, rdpp.M+1, rdpp.T-1)
+    P⁻s = ones(Float64, rdpp.M+1, rdpp.T-1)
+    # Simulate SPDE
+    @inbounds for n = 1:rdpp.T-1
+        Vₜ =  sign(ϵ[n]) * min(abs(rdpp.σ*ϵ[n]), Δx/Δt)
+        V = (-Vₜ .* rdpp.x) ./ (2.0*rdpp.D)
 
-        jump_prob_right = vcat(exp.(-rdpp.β*V[2:end]),exp(-rdpp.β*V[end]))
-        jump_prob_self = exp.(-rdpp.β*V)
-        jump_prob_left = vcat(exp(-rdpp.β*V[1]),exp.(-rdpp.β*V[1:end-1]))
-        jump_prob_denominator = jump_prob_right + jump_prob_self +
-            jump_prob_left
+        # P⁺ = vcat(exp.(-rdpp.β.*V[2:end]), exp(-rdpp.β*V[end]))
+        P⁺ = 1/(1 + exp(-rdpp.β * Vₜ * Δx / rdpp.D))
+        # P = exp.(-rdpp.β.*V[2:end-1])
+        P⁻ = 1 - P⁺
+        # Z = P⁺ .+ P⁻
+        # # Normalizing the probabilities
+        # P⁺ = P⁺ ./ Z
+        # # P = P ./ Z
+        # P⁻ = P⁻ ./ Z
 
-        # Normalizing the probabilities
-        jump_prob_right = jump_prob_right./jump_prob_denominator
-        jump_prob_self = jump_prob_self./jump_prob_denominator
-        jump_prob_left = jump_prob_left./jump_prob_denominator
+        P⁺s[:,n] .= P⁺
+        # Ps[:,n-1] = P
+        P⁻s[:,n] .= P⁻
+
+        φ₋₁ = φ[1,n] * (1-(Vₜ*Δx)/rdpp.D)
+        φₘ₊₁ = φ[end,n] * (1+(Vₜ*Δx)/rdpp.D)
+
+        # φ₋₁ = φ[1,n] * P⁻[2]/P⁺[1]
+        # φₘ₊₁ = φ[end,n] * P⁺[end-1]/P⁻[end]
 
 
-        # Compute new boundary value at 'a'
-        u[1] = jump_prob_left[1] * u0[1] +
-            jump_prob_left[2] * u0[2] +
-            jump_prob_self[1] * u0[1] - rdpp.ν * u0[1] +
-            rdpp.source_term(ds.x[1], ds.mid_price)
+        φ[1,n+1] = P⁺ * φ₋₁ +
+            P⁻ * φ[2,n] +
+            exp(rdpp.nu*n*Δt) * rdpp.source_term(rdpp.x[1], p[n])
+
+        φ[end,n+1] = P⁻ * φₘ₊₁ +
+            P⁺ * φ[end-1,n] +
+            exp(rdpp.nu*n*Δt) * rdpp.source_term(rdpp.x[end], p[n])
+
 
         # Compute Interior Points
-        u[2:end-1] = jump_prob_right[1:end-2] .* u0[1:end-2] +
-            jump_prob_left[3:end] .* u0[3:end] +
-            jump_prob_self[2:end-1] .* u0[2:end-1] -
-            rdpp.ν * u0[2:end-1] +
-            [rdpp.source_term(xᵢ, ds.mid_price) for xᵢ in ds.x[2:end-1]]
+        φ[2:end-1,n+1] = P⁺ .* φ[1:end-2,n] +
+            P⁻ * φ[3:end,n] +
+            [exp(rdpp.nu*n*Δt) * rdpp.source_term(xᵢ, p[n])
+            for xᵢ in rdpp.x[2:end-1]]
 
-        # The 'mass' at site 'j' at the next time step is the mass at 'j-1'
-        # times the probability of right plus the mass at 'j+1' times the
-        # probability of jumping left plus the mass at site 'j' that self
-        # jumps back to site 'j'.
-
-        # Compute new boundary value at b
-        u[end] = jump_prob_right[end-1] * u0[end-1] +
-            jump_prob_right[end] * u0[end] +
-            jump_prob_self[end] * u0[end] -
-            rdpp.ν * u0[end] + rdpp.source_term(ds.x[end], ds.mid_price)
-
-        u0 = u[:]
+        φ[:,n+1] = exp(-rdpp.nu*n*Δt) .* φ[:,n+1]
+        p[n+1] = extract_mid_price(rdpp, φ[:,n+1])
     end
-    return u
 
+    return φ, p, P⁺s ,P⁻s
 end
