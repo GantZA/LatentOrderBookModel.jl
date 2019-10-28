@@ -59,7 +59,7 @@ ReactionDiffusionPricePaths(dict)=ReactionDiffusionPricePaths(
 
 ReactionDiffusionPricePaths(;num_paths=1, T::Int64=100,
     p₀::Real=100.0, M::Int64=100, β::Real=1.0,
-    sample_std::Real=4.0, D::Real=5.0, σ::Real=1.0,
+    sample_std::Real=4.0, D::Real=5.0, σ::Real=0.01,
     nu::Real=0.0, λ::Real=1.0, μ::Real=0.5) =
     ReactionDiffusionPricePaths(num_paths, T, p₀,
     M, β, sample_std, D, σ, nu, SourceTerm(λ, μ))

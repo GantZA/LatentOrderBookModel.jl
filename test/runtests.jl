@@ -38,7 +38,6 @@ include("../src/main.jl")
     end
 
     @testset "Main Default Arguments" begin
-
         @test all(main("return") .== rdpp(1))
     end
 end
