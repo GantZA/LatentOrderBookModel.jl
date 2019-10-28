@@ -24,7 +24,7 @@ include("../src/main.jl")
 
     @testset "Command Line Parse Default Arguments" begin
         @test parse_commandline() == Dict("μ" => 0.5,
-            "num_paths" => 1
+            "num_paths" => 1,
             "T" => 100,
             "p₀" => 100.0,
             "λ" => 1.0,
