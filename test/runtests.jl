@@ -6,10 +6,10 @@ include("../src/main.jl")
 @testset "All Tests" begin
     rdpp = ReactionDiffusionPricePaths()
     @testset "Reproducibility" begin
-        rdpp_1 = ReactionDiffusionPricePaths(2300, 10, 238.745, 501, 2.0, 7.415,
-            5.0, 0.001, 1.0, SourceTerm(1.0, 0.5))
-        rdpp_2 = ReactionDiffusionPricePaths(2300, 10, 238.745, 501, 2.0, 7.415,
-            5.0, 0.001, 1.0, SourceTerm(1.0, 0.5))
+        rdpp_1 = ReactionDiffusionPricePaths(1, 1000, 238.745, 500, 2.0, 7.415,
+            5.0, 0.001, 0.0, SourceTerm(1.0, 0.5))
+        rdpp_2 = ReactionDiffusionPricePaths(1, 1000, 238.745, 500, 2.0, 7.415,
+            5.0, 0.001, 0.0, SourceTerm(1.0, 0.5))
         @test all(rdpp_1(45) .== rdpp_2(45))
 
         @test all(rdpp_1(51) .== rdpp_2(51))
@@ -18,21 +18,22 @@ include("../src/main.jl")
     end;
 
     @testset "Default Values" begin
-        @test size(rdpp(),1) == 100
+        lob_densities, price_paths, P⁺s, P⁻s = rdpp()
+        @test size(price_paths) == (100,1)
     end;
 
     @testset "Command Line Parse Default Arguments" begin
         @test parse_commandline() == Dict("μ" => 0.5,
+            "num_paths" => 1
             "T" => 100,
             "p₀" => 100.0,
             "λ" => 1.0,
             "SEED" => 1,
-            "boltz_const" => 1.0,
-            "nu" => 0.001,
-            "σ" => 1.0,
+            "β" => 1.0,
+            "nu" => 0.0,
+            "σ" => 0.001,
             "D" => 5.0,
-            "n_spatial_points" => 101,
-            "τ" => 10,
+            "M" => 100,
             "sample_std" => 4.0)
     end
 
