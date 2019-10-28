@@ -10,7 +10,7 @@ end
 
 
 function extract_mid_price(rdpp, lob_density)
-    mid_price_ind = 1
+    mid_price_ind = 2
     while lob_density[mid_price_ind] > 0
         mid_price_ind += 1
     end
