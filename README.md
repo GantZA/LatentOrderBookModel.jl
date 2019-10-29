@@ -46,14 +46,14 @@ Each interface uses the same positional arguments which are:
 ```
 julia> using LatentOrderBookModel
 julia> rdpp = ReactionDiffusionPricePaths(num_paths=1 ,T=2300, p₀=238.745,
-  M=500, β=2.0, sample_std=7.415, D=5.0, σ=0.01, nu=0.0, λ=1.0, μ=0.5)
+  M=500, β=2.0, sample_std=20.0, D=5.0, σ=4.0, nu=0.0, λ=1.0, μ=0.5)
 julia> rdpp(45)
 
 ```
 
 ### Shell
 ```
-$ julia src/main.jl 45 1 2300 238.745 500 2.0 7.415 5.0 0.01 0.0 1.0 0.5
+$ julia src/main.jl 45 1 2300 238.745 500 2.0 20.0 5.0 4.0 0.0 1.0 0.5
 ```
 
 ### Compile using PackageCompiler.jl (requires master version)
@@ -66,7 +66,7 @@ julia> PackageCompiler.compile_package("ArgParser" ,"LatentOrderBookModel")
 ```
 After the Julia image has been compiled
 ```
-julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 1 2300 238.745 500 2.0 7.415 5.0 0.01 0.0 1.0 0.5
+julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 1 2300 238.745 500 2.0 20.0 5.0 4.0 0.0 1.0 0.5
 
 ```
 
@@ -81,5 +81,5 @@ julia> build_executable("lobm_exec.jl", "lobm_exec")
 ```
 After the executable has been successfully built
 ```
-$ ./builddir/lobm_exec 45 1 2300 238.745 500 2.0 7.415 5.0 0.01 0.0 1.0 0.5
+$ ./builddir/lobm_exec 45 1 2300 238.745 500 2.0 20.0 5.0 4.0 0.0 1.0 0.5
 ```
