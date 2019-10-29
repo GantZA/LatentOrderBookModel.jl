@@ -59,7 +59,7 @@ $ julia src/main.jl 45 1 2300 238.745 500 2.0 7.415 5.0 0.01 0.0 1.0 0.5
 ### Compile using PackageCompiler.jl (requires master version)
 
 ```
-julia> ] dev PackageCompiler
+julia> ] add PackageCompiler#master
 julia> using PackageCompiler
 julia> PackageCompiler.compile_package("ArgParser" ,"LatentOrderBookModel")
 
