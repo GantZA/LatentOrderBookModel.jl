@@ -24,9 +24,9 @@ The `ReactionDiffusionPricePaths` object is created by instantiating the struct 
 
 There are 2 command line interfaces which can be accesed. The commands and arguments are detailed below.
 1) Running `$ julia src/main.jl arg1 arg2 ...`
-2) After building the executable, `lobm_exec arg1 arg2 ...`
+2) After building the executable, `lobm arg1 arg2 ...`
 
-Each interface uses the same positional arguments which are:
+Each command line interface uses the same positional arguments which are:
 * SEED :: Integer - The seed used for any random number generation. This ensures that paths are reproducible. A value of -1 will generate and use random seeds.
 * num_paths :: Integer - The number of price paths to simulate
 * T :: Integer - Number of time periods that are simulated
@@ -60,9 +60,7 @@ $ julia src/main.jl 45 1 2300 238.745 500 2.0 20.0 5.0 4.0 0.0 1.0 0.5
 
 ```
 julia> ] add PackageCompiler#master
-julia> using PackageCompiler
-julia> PackageCompiler.compile_package("ArgParser" ,"LatentOrderBookModel")
-
+$ make compile
 ```
 After the Julia image has been compiled
 ```
@@ -73,13 +71,10 @@ julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 1 2300 238.74
 ### Build Executable using PackageCompiler.jl (requires master version)
 
 ```
-$ cd src
-$ julia
-julia> using PackageCompiler
-julia> build_executable("lobm_exec.jl", "lobm_exec")
+$ make build
 
 ```
 After the executable has been successfully built
 ```
-$ ./builddir/lobm_exec 45 1 2300 238.745 500 2.0 20.0 5.0 4.0 0.0 1.0 0.5
+$ ./builddir/lobm 45 1 2300 238.745 500 2.0 20.0 5.0 4.0 0.0 1.0 0.5
 ```
