@@ -34,7 +34,7 @@ include("../src/main.jl")
             "σ" => 4.0,
             "D" => 5.0,
             "M" => 100,
-            "sample_std" => 10.0)
+            "L" => 10.0)
     end
 
     @testset "Main Default Arguments" begin

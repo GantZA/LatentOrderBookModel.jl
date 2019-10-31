@@ -33,10 +33,10 @@ Each command line interface uses the same positional arguments which are:
 * p₀ :: Float - The initial mid-price that each simulation begins at
 * M :: Integer - The number of discretized price points used to solve the PDE
 * β :: Float - The Boltzmann constant used in calculating the Boltzmann Potential
-* sample_std :: Float - The sample standard deviation of the price path. Used to find an upper and lower bound for the discretized price grid.
+* L :: Float - The length of the price grid. L and p₀ determine x₀ and xₘ
 * D :: Float - The Diffusion coefficient in the PDE
 * σ :: Float - The scaling value for the Stochastic Drift term
-* nu :: Float - The latent order cancellation rate, should be set to 0.0 in the Simple LOB model 
+* nu :: Float - The latent order cancellation rate, should be set to 0.0 in the Simple LOB model
 * λ :: Float - Source Term function parameter 1
 * μ :: Float - Source Term function parameter 2
 ## Example Usage
@@ -46,7 +46,7 @@ Each command line interface uses the same positional arguments which are:
 ```
 julia> using LatentOrderBookModel
 julia> rdpp = ReactionDiffusionPricePaths(num_paths=1 ,T=2300, p₀=238.745,
-  M=500, β=2.0, sample_std=20.0, D=5.0, σ=4.0, nu=0.0, λ=1.0, μ=0.5)
+  M=500, β=2.0, L=20.0, D=5.0, σ=4.0, nu=0.0, λ=1.0, μ=0.5)
 julia> rdpp(45)
 
 ```

@@ -26,7 +26,7 @@ function parse_commandline()
         "β"
             arg_type = Float64
             default = 1.0
-        "sample_std"
+        "L"
             arg_type = Float64
             default = 10.0
         "D"

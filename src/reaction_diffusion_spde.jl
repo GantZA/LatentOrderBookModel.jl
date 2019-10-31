@@ -1,7 +1,6 @@
 function initial_conditions_steady_state(rdpp::ReactionDiffusionPricePaths)
-    L = rdpp.x[end] - rdpp.x[1]
     φ = [
-            (xᵢ-rdpp.p₀) * rdpp.source_term.λ/(2 * rdpp.D * rdpp.source_term.μ) * exp((-rdpp.source_term.μ * L^2) / 4) +
+            (xᵢ-rdpp.p₀) * rdpp.source_term.λ/(2 * rdpp.D * rdpp.source_term.μ) * exp((-rdpp.source_term.μ * rdpp.L^2) / 4) +
             (sqrt(pi) * rdpp.source_term.λ * erf(sqrt(rdpp.source_term.μ) * (rdpp.p₀ - xᵢ)))/(4 * rdpp.D * rdpp.source_term.μ^(3/2))
             for xᵢ in rdpp.x
         ]
@@ -27,7 +26,7 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
 
     φ = ones(Float64, rdpp.M+1, rdpp.T)
     φ[:,1] = initial_conditions_steady_state(rdpp)
-    Δx = (rdpp.x[end] - rdpp.x[1])/(rdpp.M)
+    Δx = rdpp.L/rdpp.M
     Δt = (Δx^2) / (2.0*rdpp.D)
 
     p =  ones(Float64, rdpp.T) * rdpp.p₀

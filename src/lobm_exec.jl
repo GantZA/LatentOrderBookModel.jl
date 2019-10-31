@@ -6,7 +6,7 @@ Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
     parsed_args = parse_commandline()
     rdpp = ReactionDiffusionPricePaths(
         parsed_args["num_paths"], parsed_args["T"], parsed_args["p₀"],
-        parsed_args["M"], parsed_args["β"], parsed_args["sample_std"],
+        parsed_args["M"], parsed_args["β"], parsed_args["L"],
         parsed_args["D"], parsed_args["σ"], parsed_args["nu"],
         SourceTerm(parsed_args["λ"], parsed_args["μ"]))
 

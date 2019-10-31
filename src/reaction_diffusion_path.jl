@@ -11,7 +11,7 @@ mutable struct ReactionDiffusionPricePaths
     p₀::Float64
     M::Int64
     β::Float64
-    sample_std::Float64
+    L::Float64
     D::Float64
     σ::Float64
     nu::Float64
@@ -19,12 +19,12 @@ mutable struct ReactionDiffusionPricePaths
     x::Array{Float64, 1}
 end
 function ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
-    sample_std, D, σ, nu, source_term)
-    x₀ = max(0.0, p₀ - 3.0*sample_std)
-    xₘ = p₀ + 3.0*sample_std
+    L, D, σ, nu, source_term)
+    x₀ = p₀ - 0.5*L
+    xₘ = p₀ + 0.5*L
     x = collect(Float64, range(x₀, xₘ, length=M+1))
     return ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
-        sample_std, D, σ, nu, source_term, x)
+        L, D, σ, nu, source_term, x)
 end
 
 
@@ -53,13 +53,13 @@ end
 
 ReactionDiffusionPricePaths(dict)=ReactionDiffusionPricePaths(
     dict["num_paths"], dict["T"], dict["p₀"], dict["M"],
-    dict["β"], dict["sample_std"], dict["D"],
+    dict["β"], dict["L"], dict["D"],
     dict["σ"], dict["nu"], SourceTerm(dict["λ"], dict["μ"]))
 
 
 ReactionDiffusionPricePaths(;num_paths=1, T::Int64=100,
     p₀::Real=100.0, M::Int64=100, β::Real=1.0,
-    sample_std::Real=10.0, D::Real=5.0, σ::Real=4.0,
+    L::Real=10.0, D::Real=5.0, σ::Real=4.0,
     nu::Real=0.0, λ::Real=1.0, μ::Real=0.5) =
     ReactionDiffusionPricePaths(num_paths, T, p₀,
-    M, β, sample_std, D, σ, nu, SourceTerm(λ, μ))
+    M, β, L, D, σ, nu, SourceTerm(λ, μ))
