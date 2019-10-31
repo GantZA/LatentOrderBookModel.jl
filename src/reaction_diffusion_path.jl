@@ -22,6 +22,12 @@ function ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
     L, D, σ, nu, source_term)
     x₀ = p₀ - 0.5*L
     xₘ = p₀ + 0.5*L
+    @assert x₀ >= 0
+
+    if D < 1.5 * σ
+        @warn "D is less than 1.5 times σ which runs the risk of unstable LOB ghost points"
+    end
+
     x = collect(Float64, range(x₀, xₘ, length=M+1))
     return ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
         L, D, σ, nu, source_term, x)
@@ -38,7 +44,6 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
     price_paths = ones(Float64, rdpp.T, rdpp.num_paths) * rdpp.p₀
     lob_densities = zeros(Float64, rdpp.M+1, rdpp.T, rdpp.num_paths)
     P⁺s = ones(Float64, rdpp.M+1, rdpp.T-1, rdpp.num_paths)
-    # Ps = ones(Float64, rdpp.M+1, rdpp.T-1, rdpp.num_paths)
     P⁻s = ones(Float64, rdpp.M+1, rdpp.T-1, rdpp.num_paths)
 
     for path in 1:rdpp.num_paths

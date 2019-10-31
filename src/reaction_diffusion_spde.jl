@@ -44,8 +44,8 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
         P⁺s[n] .= P⁺
         P⁻s[n] .= P⁻
 
-        φ₋₁ = φ[1,n] * (1-(Vₜ*Δx)/rdpp.D)
-        φₘ₊₁ = φ[end,n] * (1+(Vₜ*Δx)/rdpp.D)
+        φ₋₁ = φ[1,n] * (1-(Vₜ*Δx)/(2*rdpp.D))
+        φₘ₊₁ = φ[end,n] * (1+(Vₜ*Δx)/(2*rdpp.D))
 
         φ[1,n+1] = P⁺ * φ₋₁ +
             P⁻ * φ[2,n] +
