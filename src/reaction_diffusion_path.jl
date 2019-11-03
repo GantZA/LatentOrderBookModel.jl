@@ -28,7 +28,7 @@ function ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
     end
     Δx = L/M
     if (β*Δx/D < log(1/3)/2) | (β*Δx/D > log(3)/2)
-        @warn "The choice of β, D, L, M might result in jump probabilities > 0.75, thus causing large shifts in the LOB density" 
+        @warn "The choice of β, D, L, M might result in jump probabilities > 0.75, thus causing large shifts in the LOB density"
     end
 
 
@@ -47,13 +47,13 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
 
     price_paths = ones(Float64, rdpp.T, rdpp.num_paths) * rdpp.p₀
     lob_densities = zeros(Float64, rdpp.M+1, rdpp.T, rdpp.num_paths)
-    P⁺s = ones(Float64, rdpp.M+1, rdpp.T-1, rdpp.num_paths)
-    P⁻s = ones(Float64, rdpp.M+1, rdpp.T-1, rdpp.num_paths)
+    P⁺s = ones(Float64, rdpp.T-1, rdpp.num_paths)
+    P⁻s = ones(Float64, rdpp.T-1, rdpp.num_paths)
 
     for path in 1:rdpp.num_paths
          Random.seed!(seeds[path])
-        lob_densities[:, :, path], price_paths[:, path], P⁺s[:,:,path],
-            P⁻s[:,:,path]  = dtrw_solver(rdpp)
+        lob_densities[:, :, path], price_paths[:, path], P⁺s[:, path],
+            P⁻s[:, path]  = dtrw_solver(rdpp)
     end
 
     return lob_densities, price_paths, P⁺s, P⁻s
