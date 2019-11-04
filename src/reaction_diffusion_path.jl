@@ -24,7 +24,7 @@ function ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
     xₘ = p₀ + 0.5*L
     @assert x₀ >= 0
     if D < 1.5 * σ
-        @warn "D is less than 1.5 times σ which runs the risk of unstable LOB ghost points"
+        @warn "D=$D is less than 1.5 times σ=$σ which runs the risk of unstable LOB ghost points"
     end
     Δx = L/M
     if (β*Δx/D < log(1/3)/2) | (β*Δx/D > log(3)/2)
@@ -69,7 +69,7 @@ ReactionDiffusionPricePaths(dict)=ReactionDiffusionPricePaths(
 
 ReactionDiffusionPricePaths(;num_paths=1, T::Int64=100,
     p₀::Real=100.0, M::Int64=100, β::Real=1.0,
-    L::Real=10.0, D::Real=5.0, σ::Real=4.0,
+    L::Real=10.0, D::Real=7.0, σ::Real=4.0,
     nu::Real=0.0, λ::Real=1.0, μ::Real=0.5) =
     ReactionDiffusionPricePaths(num_paths, T, p₀,
     M, β, L, D, σ, nu, SourceTerm(λ, μ))
