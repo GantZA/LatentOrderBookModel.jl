@@ -6,10 +6,10 @@ include("../src/main.jl")
 @testset "All Tests" begin
     rdpp = ReactionDiffusionPricePaths()
     @testset "Reproducibility" begin
-        rdpp_1 = ReactionDiffusionPricePaths(1, 1000, 238.745, 500, 2.0, 7.415,
-            5.0, 0.001, 0.0, SourceTerm(1.0, 0.5))
-        rdpp_2 = ReactionDiffusionPricePaths(1, 1000, 238.745, 500, 2.0, 7.415,
-            5.0, 0.001, 0.0, SourceTerm(1.0, 0.5))
+        rdpp_1 = ReactionDiffusionPricePaths(1, 1000, 238.745, 500, 2.0, 100,
+            5.0, 0.01, 0.0, SourceTerm(1.0, 0.5))
+        rdpp_2 = ReactionDiffusionPricePaths(1, 1000, 238.745, 500, 2.0, 100,
+            5.0, 0.01, 0.0, SourceTerm(1.0, 0.5))
         @test all(rdpp_1(45) .== rdpp_2(45))
 
         @test all(rdpp_1(51) .== rdpp_2(51))
@@ -32,7 +32,7 @@ include("../src/main.jl")
             "β" => 1.0,
             "nu" => 0.0,
             "σ" => 4.0,
-            "D" => 5.0,
+            "D" => 7.0,
             "M" => 100,
             "L" => 10.0)
     end

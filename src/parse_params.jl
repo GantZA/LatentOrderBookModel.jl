@@ -31,7 +31,7 @@ function parse_commandline()
             default = 10.0
         "D"
             arg_type = Float64
-            default = 5.0
+            default = 7.0
         "σ"
             arg_type = Float64
             default = 4.0
