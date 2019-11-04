@@ -18,7 +18,7 @@ include("../src/main.jl")
     end;
 
     @testset "Default Values" begin
-        lob_densities, price_paths, P⁺s, P⁻s = rdpp()
+        lob_densities, price_paths, mid_price_bars, P⁺s, P⁻s = rdpp()
         @test size(price_paths) == (100,1)
     end;
 
