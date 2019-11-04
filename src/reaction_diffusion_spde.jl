@@ -8,6 +8,21 @@ function initial_conditions_steady_state(rdpp::ReactionDiffusionPricePaths)
 end
 
 
+function sample_mid_price_path(Δt, price_path)
+    time_periods = floor(Int, size(price_path, 1) * Δt)
+    price_points_per_bar = floor(Int, 1/Δt)
+    mid_prices = zeros(Float64, time_periods + 1)
+    mid_prices[1] = price_path[1]
+    for t in 1:time_periods
+        ind_start = (t-1) * price_points_per_bar + 1
+        ind_end = t * price_points_per_bar
+        price_bar = price_path[ind_start:ind_end]
+        mid_prices[t+1] = price_bar[end]
+    end
+    return mid_prices
+end
+
+
 function extract_mid_price(rdpp, lob_density)
     mid_price_ind = 2
     while lob_density[mid_price_ind] > 0
@@ -61,6 +76,6 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
 
         p[n+1] = extract_mid_price(rdpp, φ[:,n+1])
     end
-
-    return φ, p, P⁺s ,P⁻s
+    mid_price_bars_close = sample_mid_price_path(Δt, p)
+    return φ, p, mid_price_bars_close, P⁺s ,P⁻s
 end

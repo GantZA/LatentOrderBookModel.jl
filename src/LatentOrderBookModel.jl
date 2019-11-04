@@ -17,6 +17,6 @@ include("objective_surface.jl")
 __version__ = "v2.1"
 
 export ReactionDiffusionPricePaths, SourceTerm, parse_commandline,
-    ObjectiveSurface, initial_conditions_steady_state
+    ObjectiveSurface, initial_conditions_steady_state, sample_mid_price_path
 
 end # module

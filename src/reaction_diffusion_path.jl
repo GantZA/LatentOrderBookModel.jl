@@ -46,17 +46,18 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
     end
 
     price_paths = ones(Float64, rdpp.T, rdpp.num_paths) * rdpp.p₀
+    mid_price_bars = [Vector{Any}() for i in 1:rdpp.num_paths]
     lob_densities = zeros(Float64, rdpp.M+1, rdpp.T, rdpp.num_paths)
     P⁺s = ones(Float64, rdpp.T-1, rdpp.num_paths)
     P⁻s = ones(Float64, rdpp.T-1, rdpp.num_paths)
 
     for path in 1:rdpp.num_paths
          Random.seed!(seeds[path])
-        lob_densities[:, :, path], price_paths[:, path], P⁺s[:, path],
+        lob_densities[:, :, path], price_paths[:, path], mid_price_bars[path], P⁺s[:, path],
             P⁻s[:, path]  = dtrw_solver(rdpp)
     end
 
-    return lob_densities, price_paths, P⁺s, P⁻s
+    return lob_densities, price_paths, mid_price_bars, P⁺s, P⁻s
 end
 
 
