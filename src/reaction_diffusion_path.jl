@@ -23,13 +23,13 @@ function ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
     x₀ = p₀ - 0.5*L
     xₘ = p₀ + 0.5*L
     @assert x₀ >= 0
-    if D < 1.5 * σ
-        @warn "D=$D is less than 1.5 times σ=$σ which runs the risk of unstable LOB ghost points"
-    end
-    Δx = L/M
-    if (β*Δx/D < log(1/3)/2) | (β*Δx/D > log(3)/2)
-        @warn "The choice of β, D, L, M might result in jump probabilities > 0.75, thus causing large shifts in the LOB density"
-    end
+    # if D < 1.5 * σ
+    #     @warn "D=$D is less than 1.5 times σ=$σ which runs the risk of unstable LOB ghost points"
+    # end
+    # Δx = L/M
+    # if (β*Δx/D < log(1/3)/2) | (β*Δx/D > log(3)/2)
+    #     @warn "The choice of β, D, L, M might result in jump probabilities > 0.75, thus causing large shifts in the LOB density"
+    # end
 
 
     x = collect(Float64, range(x₀, xₘ, length=M+1))

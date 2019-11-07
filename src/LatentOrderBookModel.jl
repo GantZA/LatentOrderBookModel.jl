@@ -14,9 +14,13 @@ include("parse_params.jl")
 include("reaction_diffusion_spde.jl")
 include("objective_surface.jl")
 
-__version__ = "v2.1"
+__version__ = "v3.0"
 
-export ReactionDiffusionPricePaths, SourceTerm, parse_commandline,
-    ObjectiveSurface, initial_conditions_steady_state, sample_mid_price_path
+export ReactionDiffusionPricePaths,
+       SourceTerm,
+       parse_commandline,
+       ObjectiveSurface,
+       initial_conditions_steady_state,
+       sample_mid_price_path
 
 end # module
