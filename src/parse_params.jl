@@ -28,13 +28,13 @@ function parse_commandline()
             default = 1.0
         "L"
             arg_type = Float64
-            default = 10.0
+            default = 50.0
         "D"
             arg_type = Float64
-            default = 7.0
+            default = 4.0
         "σ"
             arg_type = Float64
-            default = 4.0
+            default = 1.0
         "nu"
             arg_type = Float64
             default = 0.0
