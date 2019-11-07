@@ -47,8 +47,8 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
 
     Δx = rdpp.L/rdpp.M
     Δt = (Δx^2) / (2.0*rdpp.D)
-    time_steps = ceil(Int ,rdpp.T * Δt)
-
+    time_steps = ceil(Int ,rdpp.T / Δt)
+    
     raw_price_paths = ones(Float64, time_steps, rdpp.num_paths)
     raw_price_paths[1, :] .= rdpp.p₀
     sample_price_paths = ones(Float64, rdpp.T, rdpp.num_paths)
