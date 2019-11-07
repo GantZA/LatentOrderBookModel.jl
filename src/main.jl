@@ -8,8 +8,8 @@ function main(output="stdout")
         parsed_args["D"], parsed_args["σ"], parsed_args["nu"],
         SourceTerm(parsed_args["λ"], parsed_args["μ"]))
     if output=="stdout"
-        lob_densities, price_paths, mid_price_bars, P⁺s, P⁻s = rdpp(parsed_args["SEED"])
-        print(price_paths[:,1])
+        lob_densities, raw_price_paths, sample_price_paths, P⁺s, P⁻s = rdpp(parsed_args["SEED"])
+        print(sample_price_paths[:,1])
     else
         return rdpp(parsed_args["SEED"])
     end
