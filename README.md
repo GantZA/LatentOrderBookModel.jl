@@ -46,14 +46,14 @@ Each command line interface uses the same positional arguments which are:
 ```
 julia> using LatentOrderBookModel
 julia> rdpp = ReactionDiffusionPricePaths(num_paths=1 ,T=2300, p₀=238.745,
-  M=500, β=2.0, L=20.0, D=5.0, σ=4.0, nu=0.0, λ=1.0, μ=0.5)
+  M=100, β=2.0, L=120.0, D=5.0, σ=0.5, nu=0.0, λ=1.0, μ=0.002)
 julia> rdpp(45)
 
 ```
 
 ### Shell
 ```
-$ julia src/main.jl 45 1 2300 238.745 500 2.0 20.0 5.0 4.0 0.0 1.0 0.5
+$ julia src/main.jl 45 1 2300 238.745 100 2.0 120.0 5.0 0.5 0.0 1.0 0.002
 ```
 
 ### Compile using PackageCompiler.jl (requires master version)
@@ -64,7 +64,7 @@ $ make compile
 ```
 After the Julia image has been compiled
 ```
-julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 1 2300 238.745 500 2.0 20.0 5.0 4.0 0.0 1.0 0.5
+julia -J ~/.julia/dev/PackageCompiler/sysimg/sys.so src/main.jl 45 1 2300 238.745 100 2.0 120.0 5.0 0.5 0.0 1.0 0.002
 
 ```
 
@@ -76,5 +76,5 @@ $ make build
 ```
 After the executable has been successfully built
 ```
-$ ./builddir/lobm 45 1 2300 238.745 500 2.0 20.0 5.0 4.0 0.0 1.0 0.5
+$ ./builddir/lobm 45 1 2300 238.745 100 2.0 120.0 5.0 0.5 0.0 1.0 0.002
 ```
