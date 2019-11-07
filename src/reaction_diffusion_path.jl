@@ -48,14 +48,14 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
     Δx = rdpp.L/rdpp.M
     Δt = (Δx^2) / (2.0*rdpp.D)
     time_steps = ceil(Int ,rdpp.T / Δt)
-    
-    raw_price_paths = ones(Float64, time_steps, rdpp.num_paths)
+
+    raw_price_paths = ones(Float64, time_steps + 1, rdpp.num_paths)
     raw_price_paths[1, :] .= rdpp.p₀
-    sample_price_paths = ones(Float64, rdpp.T, rdpp.num_paths)
+    sample_price_paths = ones(Float64, rdpp.T + 1, rdpp.num_paths)
     sample_price_paths[1, :] .= rdpp.p₀
-    lob_densities = zeros(Float64, rdpp.M+1, time_steps, rdpp.num_paths)
-    P⁺s = ones(Float64, time_steps-1, rdpp.num_paths)
-    P⁻s = ones(Float64, time_steps-1, rdpp.num_paths)
+    lob_densities = zeros(Float64, rdpp.M+1, time_steps + 1, rdpp.num_paths)
+    P⁺s = ones(Float64, time_steps, rdpp.num_paths)
+    P⁻s = ones(Float64, time_steps, rdpp.num_paths)
 
     for path in 1:rdpp.num_paths
          Random.seed!(seeds[path])
@@ -76,7 +76,7 @@ ReactionDiffusionPricePaths(dict)=ReactionDiffusionPricePaths(
 
 ReactionDiffusionPricePaths(;num_paths=1, T::Int64=100,
     p₀::Real=100.0, M::Int64=100, β::Real=1.0,
-    L::Real=10.0, D::Real=7.0, σ::Real=4.0,
+    L::Real=50.0, D::Real=4.0, σ::Real=1.0,
     nu::Real=0.0, λ::Real=1.0, μ::Real=0.5) =
     ReactionDiffusionPricePaths(num_paths, T, p₀,
     M, β, L, D, σ, nu, SourceTerm(λ, μ))

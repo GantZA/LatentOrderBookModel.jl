@@ -8,16 +8,12 @@ function initial_conditions_steady_state(rdpp::ReactionDiffusionPricePaths)
 end
 
 
-function sample_mid_price_path(Δt, price_path)
-    time_periods = floor(Int, size(price_path, 1) * Δt)
-    price_points_per_bar = floor(Int, 1/Δt)
-    mid_prices = zeros(Float64, time_periods + 1)
+function sample_mid_price_path(rdpp, Δt, price_path)
+    mid_prices = zeros(Float64, rdpp.T+1)
     mid_prices[1] = price_path[1]
-    for t in 1:time_periods
-        ind_start = (t-1) * price_points_per_bar + 1
-        ind_end = t * price_points_per_bar
-        price_bar = price_path[ind_start:ind_end]
-        mid_prices[t+1] = price_bar[end]
+    for t in 1:rdpp.T
+        close_ind = floor(Int, t/Δt)
+        mid_prices[t+1] = price_path[close_ind]
     end
     return mid_prices
 end
@@ -40,19 +36,19 @@ end
 function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
     Δx = rdpp.L/rdpp.M
     Δt = (Δx^2) / (2.0*rdpp.D)
-    time_steps = ceil(Int ,rdpp.T * Δt)
+    time_steps = ceil(Int, rdpp.T / Δt)
 
-    φ = ones(Float64, rdpp.M+1, time_steps)
+    φ = ones(Float64, rdpp.M+1, time_steps+1)
     φ[:,1] = initial_conditions_steady_state(rdpp)
 
 
-    p =  ones(Float64, time_steps)
+    p =  ones(Float64, time_steps+1)
     p[1] = rdpp.p₀
-    ϵ = rand(Normal(0.0,1.0), time_steps-1)
-    P⁺s = ones(Float64, time_steps-1)
-    P⁻s = ones(Float64, time_steps-1)
+    ϵ = rand(Normal(0.0,1.0), time_steps)
+    P⁺s = ones(Float64, time_steps)
+    P⁻s = ones(Float64, time_steps)
 
-    @inbounds for n = 1:time_steps-1
+    @inbounds for n = 1:time_steps
         Vₜ =  sign(ϵ[n]) * min(abs(rdpp.σ*ϵ[n]), Δx/Δt)
         V = (-Vₜ .* rdpp.x) ./ (2.0*rdpp.D)
 
@@ -79,6 +75,6 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
 
         p[n+1] = extract_mid_price(rdpp, φ[:,n+1])
     end
-    mid_price_bars_close = sample_mid_price_path(Δt, p)
+    mid_price_bars_close = sample_mid_price_path(rdpp, Δt, p)
     return φ, p, mid_price_bars_close, P⁺s ,P⁻s
 end
