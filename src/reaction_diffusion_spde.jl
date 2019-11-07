@@ -38,18 +38,21 @@ end
 
 
 function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
-
-    φ = ones(Float64, rdpp.M+1, rdpp.T)
-    φ[:,1] = initial_conditions_steady_state(rdpp)
     Δx = rdpp.L/rdpp.M
     Δt = (Δx^2) / (2.0*rdpp.D)
+    time_steps = ceil(Int ,rdpp.T * Δt)
 
-    p =  ones(Float64, rdpp.T) * rdpp.p₀
-    ϵ = rand(Normal(0.0,1.0), rdpp.T-1)
-    P⁺s = ones(Float64, rdpp.T-1)
-    P⁻s = ones(Float64, rdpp.T-1)
+    φ = ones(Float64, rdpp.M+1, time_steps)
+    φ[:,1] = initial_conditions_steady_state(rdpp)
 
-    @inbounds for n = 1:rdpp.T-1
+
+    p =  ones(Float64, time_steps)
+    p[1] = rdpp.p₀
+    ϵ = rand(Normal(0.0,1.0), time_steps-1)
+    P⁺s = ones(Float64, time_steps-1)
+    P⁻s = ones(Float64, time_steps-1)
+
+    @inbounds for n = 1:time_steps-1
         Vₜ =  sign(ϵ[n]) * min(abs(rdpp.σ*ϵ[n]), Δx/Δt)
         V = (-Vₜ .* rdpp.x) ./ (2.0*rdpp.D)
 
