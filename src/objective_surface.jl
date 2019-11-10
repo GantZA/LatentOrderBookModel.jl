@@ -10,7 +10,7 @@ end
 
 
 function (os::ObjectiveSurface)(seed, para=false)
-    iterations = os.surface_points^2 * os.replications
+    iterations = os.surface_points^2
 
     seeds = Int.(rand(MersenneTwister(seed), UInt32, iterations))
     if para==true
@@ -19,7 +19,9 @@ function (os::ObjectiveSurface)(seed, para=false)
             os.params[os.param1_name] = os.param1_values[i]
             os.params[os.param2_name] = os.param2_values[i]
             rdpp = ReactionDiffusionPricePaths(os.params)
-            price_paths[:,i] = rdpp(seeds[i])
+            index_start = (i-1) * os.replications + 1
+            index_end = i * os.replications
+            _, _, sample_price_paths[:, index_start:index_end], _, _ = rdpp(seeds[i])
         end
         return price_paths
     else
@@ -28,8 +30,10 @@ function (os::ObjectiveSurface)(seed, para=false)
             os.params[os.param1_name] = os.param1_values[i]
             os.params[os.param2_name] = os.param2_values[i]
             rdpp = ReactionDiffusionPricePaths(os.params)
-            price_paths[:,i] = rdpp(seeds[i])
+            index_start = (i-1) * os.replications + 1
+            index_end = i * os.replications
+            _, _, sample_price_paths[:, index_start:index_end], _, _ = rdpp(seeds[i])
         end
-        return price_paths
+        return sample_price_paths
     end
 end
