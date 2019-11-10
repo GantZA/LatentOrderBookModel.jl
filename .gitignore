@@ -41,4 +41,7 @@ benchmarking.jl
 # examples and scratch scripts
 examples/
 
+# gifs
+*.gif
+
 # End of https://www.gitignore.io/api/julia
