@@ -1,10 +1,18 @@
-function initial_conditions_steady_state(rdpp::ReactionDiffusionPricePaths)
-    φ = [(xᵢ - rdpp.p₀) * rdpp.source_term.λ /
-         (2 * rdpp.D * rdpp.source_term.μ) *
-         exp((-rdpp.source_term.μ * rdpp.L^2) / 4) +
-         (sqrt(pi) * rdpp.source_term.λ *
-          erf(sqrt(rdpp.source_term.μ) * (rdpp.p₀ - xᵢ))) /
-         (4 * rdpp.D * rdpp.source_term.μ^(3 / 2)) for xᵢ in rdpp.x]
+function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ)
+
+    ϵ = rand(Normal(0.0, 1.0))
+    V₀ = sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
+
+    A = Tridiagonal(
+        (V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2.0)) * ones(Float64, rdpp.M),
+        ((-2.0*rdpp.D)/(rdpp.Δx^2.0) - rdpp.nu) * ones(Float64, rdpp.M+1),
+        (-V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2.0)) * ones(Float64, rdpp.M))
+
+    A[1,2] = 2.0*rdpp.D/rdpp.Δx^2
+    A[end, end-1] = 2.0*rdpp.D/rdpp.Δx^2
+
+    B = .-[rdpp.source_term(xᵢ, pₙ) for xᵢ in rdpp.x]= A \ B
+    φ = A \ B
     return φ
 end
 
@@ -36,21 +44,31 @@ end
 
 
 function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
-    Δx = rdpp.L / rdpp.M
-    Δt = (Δx^2) / (2.0 * rdpp.D)
-    time_steps = ceil(Int, rdpp.T / rdpp.Δt)
+    time_steps = floor(Int, rdpp.T / rdpp.Δt)
 
     φ = ones(Float64, rdpp.M + 1, time_steps + 1)
-    φ[:, 1] = initial_conditions_steady_state(rdpp)
+
 
 
     p = ones(Float64, time_steps + 1)
+    mid_prices = ones(Float64, rdpp.T)
+
     p[1] = rdpp.p₀
+    mid_prices[1] = rdpp.p₀
+
     ϵ = rand(Normal(0.0, 1.0), time_steps)
     P⁺s = ones(Float64, time_steps)
     P⁻s = ones(Float64, time_steps)
 
-    @inbounds for n = 1:time_steps
+    @inbounds for n = 2:rdpp.T
+        τ = floor(Int, (1 + mod(n-1, rdpp.Δt))/rdpp.Δt)
+        φ[:, n-1] = initial_conditions_numerical(rdpp, mid_prices[n-1])
+        for t = 1:τ
+
+        end
+
+
+
         Vₜ = sign(ϵ[n]) * min(abs(rdpp.σ * ϵ[n]), rdpp.Δx / rdpp.Δt)
         V = (-Vₜ .* rdpp.x) ./ (2.0 * rdpp.D)
 

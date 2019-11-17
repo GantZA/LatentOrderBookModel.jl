@@ -20,8 +20,9 @@ mutable struct ReactionDiffusionPricePaths
     Δx::Float64
     Δt::Float64
 end
-function ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
-    L, D, σ, nu, source_term)
+function ReactionDiffusionPricePaths(num_paths::Int, T::Int, p₀::Float64,
+    M::Int, β::Float64, L::Float64, D::Float64, σ::Float64, nu::Float64,
+    source_term::SourceTerm)
     x₀ = p₀ - 0.5*L
     xₘ = p₀ + 0.5*L
     @assert x₀ >= 0
@@ -55,9 +56,12 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
 
     raw_price_paths = ones(Float64, time_steps + 1, rdpp.num_paths)
     raw_price_paths[1, :] .= rdpp.p₀
+
     sample_price_paths = ones(Float64, rdpp.T + 1, rdpp.num_paths)
     sample_price_paths[1, :] .= rdpp.p₀
+
     lob_densities = zeros(Float64, rdpp.M+1, time_steps + 1, rdpp.num_paths)
+
     P⁺s = ones(Float64, time_steps, rdpp.num_paths)
     P⁻s = ones(Float64, time_steps, rdpp.num_paths)
 

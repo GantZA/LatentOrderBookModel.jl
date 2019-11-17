@@ -14,7 +14,7 @@ include("parse_params.jl")
 include("reaction_diffusion_spde.jl")
 include("objective_surface.jl")
 
-__version__ = "v3.0"
+__version__ = "Sequential LOB"
 
 export ReactionDiffusionPricePaths,
        SourceTerm,
