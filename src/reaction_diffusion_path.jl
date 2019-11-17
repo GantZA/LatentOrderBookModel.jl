@@ -11,7 +11,7 @@ mutable struct ReactionDiffusionPricePaths
     p₀::Float64
     M::Int64
     β::Float64
-    L::Float64
+    L::Int64
     D::Float64
     σ::Float64
     nu::Float64
@@ -21,7 +21,7 @@ mutable struct ReactionDiffusionPricePaths
     Δt::Float64
 end
 function ReactionDiffusionPricePaths(num_paths::Int, T::Int, p₀::Float64,
-    M::Int, β::Float64, L::Real, D::Float64, σ::Float64, nu::Float64,
+    M::Int, β::Float64, L::Int, D::Float64, σ::Float64, nu::Float64,
     source_term::SourceTerm)
     x₀ = p₀ - 0.5*L
     xₘ = p₀ + 0.5*L
@@ -36,7 +36,7 @@ function ReactionDiffusionPricePaths(num_paths::Int, T::Int, p₀::Float64,
 
 
     x = collect(Float64, range(x₀, xₘ, length=M+1))
-    Δx = L/M
+    Δx = L//M
     Δt = (Δx^2) / (2.0*D)
     return ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
         L, D, σ, nu, source_term, x, Δx, Δt)
@@ -50,9 +50,9 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
             seeds = Int.(rand(MersenneTwister(seed), UInt32, rdpp.num_paths))
     end
 
-    Δx = rdpp.L/rdpp.M
+    Δx = rdpp.L//rdpp.M
     Δt = (Δx^2) / (2.0*rdpp.D)
-    time_steps = ceil(Int ,rdpp.T / Δt)
+    time_steps = ceil(Int ,rdpp.T / rdpp.Δt)
 
     raw_price_paths = ones(Float64, time_steps + 1, rdpp.num_paths)
     raw_price_paths[1, :] .= rdpp.p₀
@@ -84,7 +84,7 @@ ReactionDiffusionPricePaths(dict)=ReactionDiffusionPricePaths(
 
 ReactionDiffusionPricePaths(;num_paths=1, T::Int64=100,
     p₀::Real=100.0, M::Int64=100, β::Real=1.0,
-    L::Real=50.0, D::Real=4.0, σ::Real=1.0,
+    L::Int=50, D::Real=4.0, σ::Real=1.0,
     nu::Real=0.0, λ::Real=1.0, μ::Real=0.5) =
     ReactionDiffusionPricePaths(num_paths, T, p₀,
     M, β, L, D, σ, nu, SourceTerm(λ, μ))

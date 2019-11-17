@@ -3,12 +3,12 @@ function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ)
     V₀ = sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
 
     A = Tridiagonal(
-        (V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2.0)) * ones(Float64, rdpp.M),
-        ((-2.0*rdpp.D)/(rdpp.Δx^2.0) - rdpp.nu) * ones(Float64, rdpp.M+1),
-        (-V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2.0)) * ones(Float64, rdpp.M))
+        (V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2)) * ones(Float64, rdpp.M),
+        ((-2.0*rdpp.D)/(rdpp.Δx^2) - rdpp.nu) * ones(Float64, rdpp.M+1),
+        (-V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2)) * ones(Float64, rdpp.M))
 
-    A[1,2] = 2.0*rdpp.D/rdpp.Δx^2
-    A[end, end-1] = 2.0*rdpp.D/rdpp.Δx^2
+    A[1,1] = (-rdpp.D)/(rdpp.Δx^2) - rdpp.nu + V₀/(2.0*rdpp.Δx)
+    A[end, end] = 2.0*rdpp.D/rdpp.Δx^2
 
     B = .-[rdpp.source_term(xᵢ, pₙ) for xᵢ in rdpp.x]
     φ = A \ B
@@ -60,7 +60,7 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
 
     @inbounds for n = 1:rdpp.T
         τ = floor(Int, (1 + mod(n-1, rdpp.Δt))/rdpp.Δt)
-        φ[:, initial_lob_index] = initial_conditions_numerical(rdpp, mid_prices[n-1], ϵ)
+        φ[:, initial_lob_index] = initial_conditions_numerical(rdpp, mid_prices[n-1])
 
         for t = 1:τ
             running_index = initial_lob_index + t
