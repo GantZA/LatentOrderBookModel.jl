@@ -13,7 +13,7 @@ function sample_mid_price_path(rdpp, Δt, price_path)
     mid_prices = zeros(Float64, rdpp.T + 1)
     mid_prices[1] = price_path[1]
     for t = 1:rdpp.T
-        close_ind = floor(Int, t / Δt)
+        close_ind = floor(Int, t / Δt) + 1
         mid_prices[t+1] = price_path[close_ind]
     end
     return mid_prices
@@ -38,7 +38,7 @@ end
 function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
     Δx = rdpp.L / rdpp.M
     Δt = (Δx^2) / (2.0 * rdpp.D)
-    time_steps = ceil(Int, rdpp.T / rdpp.Δt)
+    time_steps = floor(Int, rdpp.T / rdpp.Δt)
 
     φ = ones(Float64, rdpp.M + 1, time_steps + 1)
     φ[:, 1] = initial_conditions_steady_state(rdpp)
