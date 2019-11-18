@@ -8,7 +8,7 @@ function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ)
         (-V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2)) * ones(Float64, rdpp.M))
 
     A[1,1] = (-rdpp.D)/(rdpp.Δx^2) - rdpp.nu + V₀/(2.0*rdpp.Δx)
-    A[end, end] = 2.0*rdpp.D/rdpp.Δx^2
+    A[end, end] = (-rdpp.D)/(rdpp.Δx^2) - rdpp.nu - V₀/(2.0*rdpp.Δx)
 
     B = .-[rdpp.source_term(xᵢ, pₙ) for xᵢ in rdpp.x]
     φ = A \ B
@@ -58,9 +58,9 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
 
     initial_lob_index = 1
 
-    @inbounds for n = 1:rdpp.T
+    for n = 1:rdpp.T
         τ = floor(Int, (1 + mod(n-1, rdpp.Δt))/rdpp.Δt)
-        φ[:, initial_lob_index] = initial_conditions_numerical(rdpp, mid_prices[n-1])
+        φ[:, initial_lob_index] = initial_conditions_numerical(rdpp, mid_prices[n])
 
         for t = 1:τ
             running_index = initial_lob_index + t
@@ -88,7 +88,7 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
 
             p[running_index] = extract_mid_price(rdpp, φ[:, running_index])
         end
-        initial_lob_index += initial_lob_index + τ + 1
+        initial_lob_index += τ + 1
         mid_prices[n+1] = p[initial_lob_index-1]
     end
     return φ, p, mid_prices, P⁺s, P⁻s
