@@ -14,6 +14,7 @@ Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
         parsed_args["D"],
         parsed_args["σ"],
         parsed_args["nu"],
+        parsed_args["α"],
         SourceTerm(parsed_args["λ"], parsed_args["μ"]),
     )
 

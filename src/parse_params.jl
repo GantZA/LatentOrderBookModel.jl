@@ -27,8 +27,8 @@ function parse_commandline()
             arg_type = Float64
             default = 1.0
         "L"
-            arg_type = Int
-            default = 50
+            arg_type = Float64
+            default = 50.0
         "D"
             arg_type = Float64
             default = 4.0
@@ -38,6 +38,9 @@ function parse_commandline()
         "nu"
             arg_type = Float64
             default = 0.0
+        "α"
+            arg_type = Float64
+            default = 1.0
         "λ"
             arg_type = Float64
             default = 1.0
