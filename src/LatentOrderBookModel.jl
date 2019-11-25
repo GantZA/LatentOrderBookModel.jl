@@ -7,6 +7,7 @@ using Random
 using SharedArrays
 using Distributed
 using SpecialFunctions
+using ArgParse
 
 include("source_function.jl")
 include("reaction_diffusion_path.jl")
