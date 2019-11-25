@@ -7,7 +7,7 @@ function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ)
         ((-2.0*rdpp.D)/(rdpp.Δx^2) - rdpp.nu) * ones(Float64, rdpp.M+1),
         (-V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2)) * ones(Float64, rdpp.M))
 
-    A[1,1] = (-rdpp.D)/(rdpp.Δx^2) - rdpp.nu + V₀/(2.0*rdpp.Δx)
+    A[1,1] = (-rdpp.D)/(rdpp.Δx^2) - rdpp.nu - V₀/(2.0*rdpp.Δx)
     A[end, end] = (-rdpp.D)/(rdpp.Δx^2) - rdpp.nu - V₀/(2.0*rdpp.Δx)
 
     B = .-[rdpp.source_term(xᵢ, pₙ) for xᵢ in rdpp.x]
