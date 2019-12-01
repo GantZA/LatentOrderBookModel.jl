@@ -21,8 +21,9 @@ mutable struct ReactionDiffusionPricePaths
     Δx::Float64
     Δt::Float64
 end
-function ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
-    L, D, σ, nu, α, source_term)
+function ReactionDiffusionPricePaths(num_paths::Int64, T::Int64, p₀::Float64,
+    M::Int64, β::Float64, L::Float64, D::Float64, σ::Float64, nu::Float64,
+    α::Float64, source_term::SourceTerm)
     x₀ = p₀ - 0.5*L
     xₘ = p₀ + 0.5*L
     @assert x₀ >= 0
@@ -43,6 +44,20 @@ function ReactionDiffusionPricePaths(num_paths, T, p₀, M, β,
 end
 
 
+ReactionDiffusionPricePaths(dict)=ReactionDiffusionPricePaths(
+    dict["num_paths"], dict["T"], dict["p₀"], dict["M"],
+    dict["β"], dict["L"], dict["D"],
+    dict["σ"], dict["nu"], dict["α"], SourceTerm(dict["λ"], dict["μ"]))
+
+
+ReactionDiffusionPricePaths(;num_paths::Int64=1, T::Int64=100,
+    p₀::Real=100.0, M::Int64=100, β::Real=1.0,
+    L::Real=50.0, D::Real=4.0, σ::Real=1.0,
+    nu::Real=0.0, α::Real=1.0, λ::Real=1.0, μ::Real=0.5) =
+    ReactionDiffusionPricePaths(num_paths, T, p₀, M, β, L, D, σ, nu, α,
+    SourceTerm(λ, μ))
+
+
 function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
     if seed == -1
             seeds = Int.(rand(MersenneTwister(), UInt32, rdpp.num_paths))
@@ -52,7 +67,7 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
 
     Δx = rdpp.L/rdpp.M
     Δt = (Δx^2) / (2.0*rdpp.D)
-    time_steps = floor(Int ,rdpp.T / Δt)
+    time_steps = floor(Int, rdpp.T / Δt)
 
     raw_price_paths = ones(Float64, time_steps + 1, rdpp.num_paths)
     raw_price_paths[1, :] .= rdpp.p₀
@@ -71,17 +86,3 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
 
     return lob_densities, raw_price_paths, sample_price_paths, P⁺s, P⁻s
 end
-
-
-ReactionDiffusionPricePaths(dict)=ReactionDiffusionPricePaths(
-    dict["num_paths"], dict["T"], dict["p₀"], dict["M"],
-    dict["β"], dict["L"], dict["D"],
-    dict["σ"], dict["nu"], dict["α"], SourceTerm(dict["λ"], dict["μ"]))
-
-
-ReactionDiffusionPricePaths(;num_paths=1, T::Int64=100,
-    p₀::Real=100.0, M::Int64=100, β::Real=1.0,
-    L::Real=50.0, D::Real=4.0, σ::Real=1.0,
-    nu::Real=0.0, α::Real=1.0, λ::Real=1.0, μ::Real=0.5) =
-    ReactionDiffusionPricePaths(num_paths, T, p₀,
-    M, β, L, D, σ, nu, α, SourceTerm(λ, μ))
