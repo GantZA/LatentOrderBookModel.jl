@@ -29,7 +29,7 @@ end
 
 function extract_mid_price(rdpp, lob_density)
     mid_price_ind = 2
-    while lob_density[mid_price_ind] > 0
+    while (lob_density[mid_price_ind] > 0) | (lob_density[mid_price_ind+1]>lob_density[mid_price_ind])
         mid_price_ind += 1
     end
 
@@ -39,6 +39,68 @@ function extract_mid_price(rdpp, lob_density)
 
     mid_price = round(-(y1 * rdpp.Δx)/(y2 - y1) + x1, digits = 2)
     return mid_price
+end
+
+
+function calculate_right_jump_probability(Z)
+    if Z > 10
+        return 1.0
+    elseif Z < -10
+        return 0.0
+    else
+        return (exp(Z))/(exp(-Z) + exp(Z) + 1)
+    end
+end
+
+function calculate_left_jump_probability(Z)
+    if Z > 10
+        return 0.0
+    elseif Z < -10
+        return 1.0
+    else
+        return (exp(-Z))/(exp(-Z) + exp(Z) + 1)
+    end
+end
+
+function calculate_self_jump_probability(Z)
+    if Z > 10
+        return 0.0
+    elseif Z < -10
+        return 0.0
+    else
+        return 1/(exp(-Z) + exp(Z) + 1)
+    end
+end
+
+function calculate_jump_probabilities(rdpp, Vₜ)
+    Z = (rdpp.β * Vₜ * rdpp.Δx) / (2* rdpp.D)
+    return calculate_right_jump_probability(Z), calculate_left_jump_probability(Z), calculate_self_jump_probability(Z)
+end
+
+function get_sub_period_time(rdpp, t, time_steps)
+    τ = rand(Exponential(1/rdpp.α))
+    remaining_time = time_steps - t
+    τ_periods = min(floor(Int, τ/rdpp.Δt), remaining_time)
+    return τ, τ_periods
+end
+
+
+function intra_time_period_simulate(rdpp, φ, p)
+    ϵ = rand(Normal(0.0, 1.0))
+    Vₜ = sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
+
+    P⁺, P⁻, P = calculate_jump_probabilities(rdpp, Vₜ)
+
+    φ₋₁ = φ[1]
+    φₘ₊₁ = φ[end]
+    φ_next = zeros(Float64, size(φ,1))
+
+    φ_next[1] = P⁺ * φ₋₁ + P⁻ * φ[2] + rdpp.source_term(rdpp.x[1], p)
+    φ_next[end] = P⁻ * φₘ₊₁ + P⁺ * φ[end-1] + rdpp.source_term(rdpp.x[end], p)
+    φ_next[2:end-1] = P⁺ * φ[1:end-2] + P⁻ * φ[3:end] +
+        [rdpp.source_term(xᵢ, p) for xᵢ in rdpp.x[2:end-1]]
+
+    return φ_next, P⁺, P⁻, P
 end
 
 
@@ -55,10 +117,25 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
 
     P⁺s = ones(Float64, time_steps)
     P⁻s = ones(Float64, time_steps)
+    Ps = ones(Float64, time_steps)
 
-    initial_lob_index = 1
+    t = 1
+    calendar_time_index = 1
+    while t < time_steps
+        τ, τ_periods = get_sub_period_time(rdpp, t, time_steps)
+        φ[:, t] = initial_conditions_numerical(rdpp, p[t])
+        for τₖ = 1:τ_periods
+            φ[:, t+1], P⁺s[t], P⁻s[t], Ps[t]  = intra_time_period_simulate(rdpp, φ[:, t], p[calendar_time_index])
+            p[t+1] = extract_mid_price(rdpp, φ[:, t+1])
+            if t*rdpp.Δt > calendar_time_index
+                calendar_time_index += 1
+                mid_prices[calendar_time_index] = extract_mid_price(rdpp, φ[:, t+1])
+            end
+            t += 1
+        end
+    end
 
-    for n = 1:rdpp.T
+    for t = 1:
         τ = floor(Int, (1 + mod(n-1, rdpp.Δt))/rdpp.Δt)
         φ[:, initial_lob_index] = initial_conditions_numerical(rdpp, mid_prices[n])
 
@@ -67,11 +144,11 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
             ϵ = rand(Normal(0.0, 1.0))
             Vₜ = sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
 
-            P⁺ = 1 / (1 + exp(-rdpp.β * Vₜ * rdpp.Δx / rdpp.D))
-            P⁻ = 1 - P⁺
+            P⁺, P⁻, P = calculate_jump_probabilities(rdpp, Vₜ)
 
             P⁺s[running_index-1] = P⁺
             P⁻s[running_index-1] = P⁻
+            P[running_index-1] = P
 
             φ₋₁ = φ[1, running_index-1]
             φₘ₊₁ = φ[end, running_index-1]
