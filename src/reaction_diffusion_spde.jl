@@ -52,6 +52,7 @@ function calculate_right_jump_probability(Z)
     end
 end
 
+
 function calculate_left_jump_probability(Z)
     if Z > 10
         return 0.0
@@ -61,6 +62,7 @@ function calculate_left_jump_probability(Z)
         return (exp(-Z))/(exp(-Z) + exp(Z) + 1)
     end
 end
+
 
 function calculate_self_jump_probability(Z)
     if Z > 10
@@ -72,10 +74,12 @@ function calculate_self_jump_probability(Z)
     end
 end
 
+
 function calculate_jump_probabilities(rdpp, Vₜ)
     Z = (rdpp.β * Vₜ * rdpp.Δx) / (2* rdpp.D)
     return calculate_right_jump_probability(Z), calculate_left_jump_probability(Z), calculate_self_jump_probability(Z)
 end
+
 
 function get_sub_period_time(rdpp, t, time_steps)
     τ = rand(Exponential(1/rdpp.α))
