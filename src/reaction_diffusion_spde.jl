@@ -1,13 +1,14 @@
 function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ)
-    ϵ = rand(Normal(0.0, 1.0))
-    V₀ = sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
+    # ϵ = rand(Normal(0.0, 1.0))
+    # V₀ =sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
+    V₀ = 0.0
 
     A = Tridiagonal(
         (V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2)) * ones(Float64, rdpp.M),
         ((-2.0*rdpp.D)/(rdpp.Δx^2) - rdpp.nu) * ones(Float64, rdpp.M+1),
         (-V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2)) * ones(Float64, rdpp.M))
 
-    A[1,1] = (-rdpp.D)/(rdpp.Δx^2) - rdpp.nu - V₀/(2.0*rdpp.Δx)
+    A[1,1] = (-rdpp.D)/(rdpp.Δx^2) - rdpp.nu + V₀/(2.0*rdpp.Δx)
     A[end, end] = (-rdpp.D)/(rdpp.Δx^2) - rdpp.nu - V₀/(2.0*rdpp.Δx)
 
     B = .-[rdpp.source_term(xᵢ, pₙ) for xᵢ in rdpp.x]
@@ -77,13 +78,14 @@ end
 
 function calculate_jump_probabilities(rdpp, Vₜ)
     Z = (rdpp.β * Vₜ * rdpp.Δx) / (2* rdpp.D)
-    return calculate_right_jump_probability(Z), calculate_left_jump_probability(Z), calculate_self_jump_probability(Z)
+    return calculate_right_jump_probability(Z),
+        calculate_left_jump_probability(Z), calculate_self_jump_probability(Z)
 end
 
 
 function get_sub_period_time(rdpp, t, time_steps)
     τ = rand(Exponential(1/rdpp.α))
-    remaining_time = time_steps - t
+    remaining_time = time_steps - t + 1
     τ_periods = min(floor(Int, τ/rdpp.Δt), remaining_time)
     return τ, τ_periods
 end
@@ -125,18 +127,27 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
 
     t = 1
     calendar_time_index = 1
-    while t < time_steps
+    while t <= time_steps
         τ, τ_periods = get_sub_period_time(rdpp, t, time_steps)
         φ[:, t] = initial_conditions_numerical(rdpp, p[t])
         for τₖ = 1:τ_periods
-            φ[:, t+1], P⁺s[t], P⁻s[t], Ps[t]  = intra_time_period_simulate(rdpp, φ[:, t], p[calendar_time_index])
+            φ[:, t+1], P⁺s[t], P⁻s[t], Ps[t]  = intra_time_period_simulate(rdpp,
+                φ[:, t], p[calendar_time_index])
             p[t+1] = extract_mid_price(rdpp, φ[:, t+1])
-            if t*rdpp.Δt >= calendar_time_index
+            if (t+1)*rdpp.Δt > calendar_time_index
                 calendar_time_index += 1
-                mid_prices[calendar_time_index] = extract_mid_price(rdpp, φ[:, t+1])
+                mid_prices[calendar_time_index] = extract_mid_price(rdpp,
+                    φ[:, t+1])
             end
             t += 1
         end
     end
-    return φ, p, mid_prices, P⁺s, P⁻s
+
+    # if mid_prices[end] == 1.0
+    #     calendar_time_index += 1
+    #     mid_prices[calendar_time_index] = extract_mid_price(rdpp,
+    #         φ[:, t+1])
+    # end
+
+    return φ, p, mid_prices, P⁺s, P⁻s, Ps
 end
