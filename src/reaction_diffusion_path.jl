@@ -63,25 +63,24 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
         else
             seeds = Int.(rand(MersenneTwister(seed), UInt32, rdpp.num_paths))
     end
-
-    Δx = rdpp.L/rdpp.M
-    Δt = (Δx^2) / (2.0*rdpp.D)
-    time_steps = floor(Int, rdpp.T / Δt)
+    time_steps = floor(Int, rdpp.T / rdpp.Δt)
 
     raw_price_paths = ones(Float64, time_steps + 1, rdpp.num_paths)
     raw_price_paths[1, :] .= rdpp.p₀
+
     sample_price_paths = ones(Float64, rdpp.T + 1, rdpp.num_paths)
     sample_price_paths[1, :] .= rdpp.p₀
+
     lob_densities = zeros(Float64, rdpp.M+1, time_steps + 1, rdpp.num_paths)
     P⁺s = ones(Float64, time_steps, rdpp.num_paths)
     P⁻s = ones(Float64, time_steps, rdpp.num_paths)
-
+    Ps = ones(Float64, time_steps, rdpp.num_paths)
     for path in 1:rdpp.num_paths
-         Random.seed!(seeds[path])
+        Random.seed!(seeds[path])
         lob_densities[:, :, path], raw_price_paths[:, path],
             sample_price_paths[:, path], P⁺s[:, path],
-            P⁻s[:, path]  = dtrw_solver(rdpp)
+            P⁻s[:, path], Ps[:, path]  = dtrw_solver(rdpp)
     end
 
-    return lob_densities, raw_price_paths, sample_price_paths, P⁺s, P⁻s
+    return lob_densities, raw_price_paths, sample_price_paths, P⁺s, P⁻s, Ps
 end
