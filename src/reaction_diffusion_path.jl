@@ -22,7 +22,7 @@ mutable struct ReactionDiffusionPricePaths
     Δt::Float64
 end
 function ReactionDiffusionPricePaths(num_paths::Int64, T::Int64, p₀::Float64,
-    M::Int64, β::Float64, L::Float64, D::Float64, σ::Float64, nu::Float64,
+    M::Int64, β::Float64, L::Real, D::Float64, σ::Float64, nu::Float64,
     α::Float64, source_term::SourceTerm)
     x₀ = p₀ - 0.5*L
     xₘ = p₀ + 0.5*L
