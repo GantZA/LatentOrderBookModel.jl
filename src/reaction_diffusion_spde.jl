@@ -1,7 +1,7 @@
 function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ)
-    # ϵ = rand(Normal(0.0, 1.0))
-    # V₀ =sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
-    V₀ = 0.0
+    ϵ = rand(Normal(0.0, 1.0))
+    V₀ =sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
+    # V₀ = 0.0
 
     A = Tridiagonal(
         (V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2)) * ones(Float64, rdpp.M),
