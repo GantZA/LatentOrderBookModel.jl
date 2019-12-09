@@ -24,6 +24,8 @@ end
 function ReactionDiffusionPricePaths(num_paths::Int64, T::Int64, p₀::Float64,
     M::Int64, β::Float64, L::Real, D::Float64, σ::Float64, nu::Float64,
     α::Float64, source_term::SourceTerm)
+    logger = FileLogger(Dict(Logging.Info => "info.log", Logging.Error => "error.log"), append=false)
+    global oldglobal = global_logger(logger)
     x₀ = p₀ - 0.5*L
     xₘ = p₀ + 0.5*L
     @assert x₀ >= 0
@@ -34,7 +36,6 @@ function ReactionDiffusionPricePaths(num_paths::Int64, T::Int64, p₀::Float64,
     # if (β*Δx/D < log(1/3)/2) | (β*Δx/D > log(3)/2)
     #     @warn "The choice of β, D, L, M might result in jump probabilities > 0.75, thus causing large shifts in the LOB density"
     # end
-
 
     x = collect(Float64, range(x₀, xₘ, length=M+1))
     Δx = L/M
@@ -77,6 +78,7 @@ function (rdpp::ReactionDiffusionPricePaths)(seed::Int=-1)
     Ps = ones(Float64, time_steps, rdpp.num_paths)
     for path in 1:rdpp.num_paths
         Random.seed!(seeds[path])
+        @info "path $path with seed $(seeds[path])"
         lob_densities[:, :, path], raw_price_paths[:, path],
             sample_price_paths[:, path], P⁺s[:, path],
             P⁻s[:, path], Ps[:, path]  = dtrw_solver(rdpp)

@@ -1,8 +1,4 @@
-function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ)
-    ϵ = rand(Normal(0.0, 1.0))
-    V₀ =sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
-    # V₀ = 0.0
-
+function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ, V₀)
     A = Tridiagonal(
         (V₀/(2.0*rdpp.Δx) + rdpp.D/(rdpp.Δx^2)) * ones(Float64, rdpp.M),
         ((-2.0*rdpp.D)/(rdpp.Δx^2) - rdpp.nu) * ones(Float64, rdpp.M+1),
@@ -15,6 +11,13 @@ function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ)
     φ = A \ B
     return φ
 end
+
+function initial_conditions_numerical(rdpp::ReactionDiffusionPricePaths, pₙ)
+    ϵ = rand(Normal(0.0, 1.0))
+    V₀ =sign(ϵ) * min(abs(rdpp.σ * ϵ), rdpp.Δx / rdpp.Δt)
+    return initial_conditions_numerical(rdpp, pₙ, V₀)
+end
+
 
 
 function sample_mid_price_path(rdpp, Δt, price_path)
@@ -87,7 +90,17 @@ function get_sub_period_time(rdpp, t, time_steps)
     τ = rand(Exponential(1/rdpp.α))
     remaining_time = time_steps - t + 1
     τ_periods = min(floor(Int, τ/rdpp.Δt), remaining_time)
+    @info "Waiting time=$(round(τ, digits=4)) which equates to $τ_periods time periods"
     return τ, τ_periods
+end
+
+
+function get_adaptive_price_grid(rdpp, p)
+    x₀ = p - 0.5*rdpp.L
+    xₘ = p + 0.5*rdpp.L
+    @assert x₀ >= 0
+    @info "Price grid changed from $(rdpp.x[1]):$(rdpp.x[end]) to $x₀:$xₘ"
+    return collect(Float64, range(x₀, xₘ, length=rdpp.M+1))
 end
 
 
@@ -125,29 +138,34 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
     P⁻s = ones(Float64, time_steps)
     Ps = ones(Float64, time_steps)
 
-    t = 1
+    t = 0
     calendar_time_index = 1
+    φ_prev = initial_conditions_numerical(rdpp, p[1], 0.0)
     while t <= time_steps
-        τ, τ_periods = get_sub_period_time(rdpp, t, time_steps)
+        t += 1
+        p[t] = extract_mid_price(rdpp, φ[:, t])
+        @info "Intra-period simulation. tick price = R$(p[t]) @t=$t"
         φ[:, t] = initial_conditions_numerical(rdpp, p[t])
+        if (t)*rdpp.Δt > calendar_time_index
+            calendar_time_index += 1
+            mid_prices[calendar_time_index] = p[t]
+            @info "Mid price R$(mid_prices[calendar_time_index]) sampled @n=$calendar_time_index"
+        end
+        rdpp.x = get_adaptive_price_grid(rdpp, p[t])
+        τ, τ_periods = get_sub_period_time(rdpp, t, time_steps)
+
         for τₖ = 1:τ_periods
-            φ[:, t+1], P⁺s[t], P⁻s[t], Ps[t]  = intra_time_period_simulate(rdpp,
-                φ[:, t], p[calendar_time_index])
-            p[t+1] = extract_mid_price(rdpp, φ[:, t+1])
-            if (t+1)*rdpp.Δt > calendar_time_index
-                calendar_time_index += 1
-                mid_prices[calendar_time_index] = extract_mid_price(rdpp,
-                    φ[:, t+1])
-            end
             t += 1
+            φ[:, t], P⁺s[t-1], P⁻s[t-1], Ps[t-1]  = intra_time_period_simulate(rdpp,
+                φ[:, t-1], p[calendar_time_index])
+            p[t] = extract_mid_price(rdpp, φ[:, t])
+            @info "Intra-period simulation. tick price = R$(p[t]) @t=$t"
+            if t*rdpp.Δt > calendar_time_index
+                calendar_time_index += 1
+                mid_prices[calendar_time_index] = p[t-1]
+                @info "Mid price R$(mid_prices[calendar_time_index]) sampled @n=$calendar_time_index"
+            end
         end
     end
-
-    # if mid_prices[end] == 1.0
-    #     calendar_time_index += 1
-    #     mid_prices[calendar_time_index] = extract_mid_price(rdpp,
-    #         φ[:, t+1])
-    # end
-
     return φ, p, mid_prices, P⁺s, P⁻s, Ps
 end
