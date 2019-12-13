@@ -138,20 +138,11 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
     P⁻s = ones(Float64, time_steps)
     Ps = ones(Float64, time_steps)
 
-    t = 0
+    t = 1
     calendar_time_index = 1
-    φ_prev = initial_conditions_numerical(rdpp, p[1], 0.0)
+    φ[:, t] = initial_conditions_numerical(rdpp, p[t], 0.0)
+
     while t <= time_steps
-        t += 1
-        p[t] = extract_mid_price(rdpp, φ[:, t])
-        @info "Intra-period simulation. tick price = R$(p[t]) @t=$t"
-        φ[:, t] = initial_conditions_numerical(rdpp, p[t])
-        if (t)*rdpp.Δt > calendar_time_index
-            calendar_time_index += 1
-            mid_prices[calendar_time_index] = p[t]
-            @info "Mid price R$(mid_prices[calendar_time_index]) sampled @n=$calendar_time_index"
-        end
-        rdpp.x = get_adaptive_price_grid(rdpp, p[t])
         τ, τ_periods = get_sub_period_time(rdpp, t, time_steps)
 
         for τₖ = 1:τ_periods
@@ -162,9 +153,22 @@ function dtrw_solver(rdpp::ReactionDiffusionPricePaths)
             @info "Intra-period simulation. tick price = R$(p[t]) @t=$t"
             if t*rdpp.Δt > calendar_time_index
                 calendar_time_index += 1
-                mid_prices[calendar_time_index] = p[t-1]
+                mid_prices[calendar_time_index] = p[t]
                 @info "Mid price R$(mid_prices[calendar_time_index]) sampled @n=$calendar_time_index"
             end
+        end
+        if t > time_steps
+            return φ, p, mid_prices, P⁺s, P⁻s, Ps
+        end
+        t += 1
+        φ[:, t] = initial_conditions_numerical(rdpp, p[t-1])
+        p[t] = extract_mid_price(rdpp, φ[:, t])
+        @info "LOB Density recalculated. tick price = R$(p[t]) @t=$t"
+        rdpp.x = get_adaptive_price_grid(rdpp, p[t])
+        if (t)*rdpp.Δt > calendar_time_index
+            calendar_time_index += 1
+            mid_prices[calendar_time_index] = p[t]
+            @info "Mid price R$(mid_prices[calendar_time_index]) sampled @n=$calendar_time_index"
         end
     end
     return φ, p, mid_prices, P⁺s, P⁻s, Ps
