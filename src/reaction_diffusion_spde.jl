@@ -114,9 +114,9 @@ function intra_time_period_simulate(rdpp, φ, p)
     φₘ₊₁ = φ[end]
     φ_next = zeros(Float64, size(φ,1))
 
-    φ_next[1] = P⁺ * φ₋₁ + P⁻ * φ[2] + rdpp.source_term(rdpp.x[1], p)
-    φ_next[end] = P⁻ * φₘ₊₁ + P⁺ * φ[end-1] + rdpp.source_term(rdpp.x[end], p)
-    φ_next[2:end-1] = P⁺ * φ[1:end-2] + P⁻ * φ[3:end] +
+    φ_next[1] = P⁺ * φ₋₁ + P⁻ * φ[2] - rdpp.nu * φ[1] + rdpp.source_term(rdpp.x[1], p)
+    φ_next[end] = P⁻ * φₘ₊₁ + P⁺ * φ[end-1] - rdpp.nu * φ[end] + rdpp.source_term(rdpp.x[end], p)
+    φ_next[2:end-1] = P⁺ * φ[1:end-2] + P⁻ * φ[3:end] - rdpp.nu * φ[2:end-1] +
         [rdpp.source_term(xᵢ, p) for xᵢ in rdpp.x[2:end-1]]
 
     return φ_next, P⁺, P⁻, P
