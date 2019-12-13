@@ -87,7 +87,7 @@ end
 
 
 function get_sub_period_time(rdpp, t, time_steps)
-    τ = rand(Exponential(1/rdpp.α))
+    τ = rand(Exponential(rdpp.α))
     remaining_time = time_steps - t + 1
     τ_periods = min(floor(Int, τ/rdpp.Δt), remaining_time)
     @info "Waiting time=$(round(τ, digits=4)) which equates to $τ_periods time periods"
