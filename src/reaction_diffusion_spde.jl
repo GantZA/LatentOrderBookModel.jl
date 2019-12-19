@@ -25,13 +25,17 @@ function extract_mid_price(rdpp, lob_density)
     while (lob_density[mid_price_ind] > 0) | (lob_density[mid_price_ind+1]>lob_density[mid_price_ind])
         mid_price_ind += 1
     end
-
-    y1 = lob_density[mid_price_ind-1]
-    y2 = lob_density[mid_price_ind]
-    x1 = rdpp.x[mid_price_ind-1]
-
-    mid_price = round(-(y1 * rdpp.Δx)/(y2 - y1) + x1, digits = 2)
-    return mid_price
+    try
+        y1 = lob_density[mid_price_ind-1]
+        y2 = lob_density[mid_price_ind]
+        x1 = rdpp.x[mid_price_ind-1]
+        mid_price = round(-(y1 * rdpp.Δx)/(y2 - y1) + x1, digits = 2)
+        return mid_price
+    catch e
+        println(e)
+        save("error.jld", "rdpp", rdpp, "lob_density", lob_density)
+        exit(1)
+    end
 end
 
 
