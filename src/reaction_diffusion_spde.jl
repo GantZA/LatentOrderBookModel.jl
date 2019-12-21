@@ -25,9 +25,8 @@ function extract_mid_price(rdpp, lob_density)
     while (lob_density[mid_price_ind] > 0) | (lob_density[mid_price_ind+1]>lob_density[mid_price_ind])
         mid_price_ind += 1
         if mid_price_ind > rdpp.M
-            println("Error extracting mid price!")
-            save("error.jld", "rdpp", rdpp, "lob_density", lob_density)
-            exit(1)
+            mid_price_ind += 1
+            break
         end
     end
     y1 = lob_density[mid_price_ind-1]

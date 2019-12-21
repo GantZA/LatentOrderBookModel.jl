@@ -8,7 +8,6 @@ using SharedArrays
 using Distributed
 using SpecialFunctions
 using ArgParse
-using JLD
 
 include("source_function.jl")
 include("reaction_diffusion_path.jl")
